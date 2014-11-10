@@ -1,9 +1,9 @@
-<h1>MatchTracking</h1>
+#MatchTracking
 
-<p>Requirements for running this application:</p>
+######Requirements for running this application:
 
-<p><b>MongoDB</b></p>
-<p><b>Webserver with PHP support</b></p>
+######MongoDB
+######Webserver with PHP support
 
 <p>Use folder app/ as document root. </p>
 
