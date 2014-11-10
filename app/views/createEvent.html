@@ -1,0 +1,56 @@
+<div class="content-box">
+    <form class="form-horizontal">
+        <fieldset>
+
+            <!-- Form Name -->
+            <legend>Create new event</legend>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="event_name">Event name</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.event.name" id="event_name" name="event_name" type="text" placeholder="" class="form-control input-md" required="">
+
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="place">Place</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.event.place" id="place" name="place" type="text" placeholder="" class="form-control input-md">
+
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="start">Begin date</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.event.start" id="start" name="start" type="text" placeholder="dd-mm-yyyy" class="form-control input-md">
+                    <span class="help-block">First day of the event</span>
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="end">End date</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.event.end" id="end" name="end" type="text" placeholder="dd-mm-yyyy" class="form-control input-md">
+                    <span class="help-block">Last day of the event</span>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="form-group">
+                <label class="col-md-4 control-label" ></label>
+                <div class="col-md-4">
+                    <button class="btn btn-primary" history-back="">Back</button>
+                    <button class="btn btn-primary" ng-click="vm.saveEvent(vm.event)">Save</button>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+
+</div>

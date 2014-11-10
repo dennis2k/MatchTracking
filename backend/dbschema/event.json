@@ -1,0 +1,10 @@
+{
+    'event' : 'Mææh Fall 2014',
+    'games_played' : [
+        'name' : 'Descent',
+        'players' : [
+            'tue', 'kyed', 'base'
+        ],
+        'winner' : 'tue'
+    ]
+}

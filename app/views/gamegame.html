@@ -1,0 +1,28 @@
+<div class="content-box">
+    <div class="row" ng-show="!vm.playing">
+        <div class="col-lg-6">
+            <h1>Pick games for game game</h1>
+            <div class="gamegame-entry" ng-repeat="game in vm.games">
+                <img ng-src="{{ game.image_url }}" width="150" ng-click="vm.selectGame(game)" />
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h1>Selected games</h1>
+            <button class="btn btn-link" ng-click="vm.selectedGames = []">Clear list</button>
+            <div class="gamegame-entry" ng-repeat="game in vm.selectedGames track by $index">
+                <img ng-src="{{ game.image_url }}" width="150" />
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <h1><button class="btn btn-primary" ng-click="vm.play()">Play that game gaym</button></h1>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.playing">
+        <div class="col-lg-12">
+            <span class="repeated-item" ng-repeat="game in vm.selectedGames track by $index">
+                <img ng-src="{{ game.image_url }}" width="150" />
+            </span>
+        </div>
+    </div>
+</div>
