@@ -1,0 +1,27 @@
+<div class="content-box">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Wish list</h1>
+            <a href="#/createWish">Create new wish</a>
+        </div>
+    </div>
+    <div class="row event-container" ng-repeat="wish in vm.wishes">
+
+        <div class="col-lg-8">
+            <a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeWish(wish)" ></span> </a>
+        </div>
+        <div class="col-lg-8">
+            <h1>{{ wish.name }}</h1>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" ng-src="{{ vm.trustAsUrl(wish.video_url) }}"></iframe>
+            </div>
+        </div>
+        <div class="col-md-4">
+
+        </div>
+    </div>
+</div>

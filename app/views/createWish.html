@@ -1,0 +1,62 @@
+<div class="content-box">
+    <form class="form-horizontal">
+        <fieldset>
+            <!-- Form Name -->
+            <legend>Create new wish</legend>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="name">Game</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.wish.name" id="name" name="name" type="text" placeholder="" class="form-control input-md" required="">
+
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="price">Price</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.wish.price" id="price" name="price" type="text" placeholder="" class="form-control input-md" required="">
+
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="video_url">Youtube video (url)</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.wish.video_url" id="video_url" name="video_url" type="text" placeholder="" class="form-control input-md">
+
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="poster">Your name</label>
+                <div class="col-md-4">
+                    <input ng-model="vm.wish.poster" id="poster" name="poster" type="text" class="form-control input-md">
+                </div>
+            </div>
+
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="speech">Sales talk</label>
+                <div class="col-md-4">
+                    <textarea ng-model="vm.wish.speech" id="speech" name="speech" class="form-control input-md" rows="10"></textarea>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="form-group">
+                <label class="col-md-4 control-label" ></label>
+                <div class="col-md-4">
+                    <button class="btn btn-danger" history-back="">Back</button>
+                    <button class="btn btn-primary" ng-click="vm.saveWish(vm.wish)">Save</button>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+
+</div>

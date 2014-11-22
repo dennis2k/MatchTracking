@@ -12,6 +12,7 @@
     <script type="text/javascript" src="bower_components/angular-route/angular-route.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -20,12 +21,7 @@
     <script src="http://178.62.180.69:35729/livereload.js"></script>
 
     <!-- Angular -->
-    <script type="text/javascript" src="models/models.js"></script>
-    <script type="text/javascript" src="services/services.js"></script>
-    <script type="text/javascript" src="controllers/controllers.js"></script>
-    <script type="text/javascript" src="directives/directives.js"></script>
-    <script type="text/javascript" src="filters/filters.js"></script>
-    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="dist/matchtracker.js"></script>
 </head>
 <body ng-app="matchtracker">
 <!-- Fixed navbar -->
@@ -45,6 +41,7 @@
                 <li ng-class="{active : nav.isActive('/games')}"><a  href="#/games">Games</a></li>
                 <li ng-class="{active : nav.isActive('/events')}"><a href="#/events">Events</a></li>
                 <li ng-class="{active : nav.isActive('/gamegame')}"><a href="#/gamegame">Do a Game Game</a></li>
+                <li ng-class="{active : nav.isActive('/wishlist')}"><a href="#/wishlist">Wish list</a></li>
             </ul>
             <div class="col-sm-3 col-md-3 pull-right">
                 <form class="navbar-form" role="codes" ng-submit="nav.cheat(nav.code)">

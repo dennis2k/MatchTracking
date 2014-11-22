@@ -6,12 +6,12 @@ module.exports = function(grunt) {
       coffee: {
           compile: {
               files: {
-                  'controllers/controllers.js': ['controllers/*.coffee'],
-                  'services/services.js': ['services/*.coffee'],
-                  'models/models.js': ['models/*.coffee'],
-                  'directives/directives.js': ['directives/*.coffee'],
-                  'filters/filters.js': ['filters/*.coffee'],
-                  'app.js': 'app.coffee'
+                  'build/controllers.js': ['controllers/*.coffee'],
+                  'build/services.js': ['services/*.coffee'],
+                  'build/models.js': ['models/*.coffee'],
+                  'build/directives.js': ['directives/*.coffee'],
+                  'build/filters.js': ['filters/*.coffee'],
+                  'build/app.js': 'app.coffee'
               }
           }
       },
@@ -20,6 +20,15 @@ module.exports = function(grunt) {
               files: {
                   'css/style.css': 'sass/style.sass'
               }
+          }
+      },
+      concat: {
+          options: {
+              separator: ';'
+          },
+          dist: {
+              src: ['build/controllers.js', 'build/services.js', 'build/models.js', 'build/directives.js','build/filters.js','build/app.js'],
+              dest: 'dist/matchtracker.js'
           }
       },
       watch : {
@@ -38,7 +47,7 @@ module.exports = function(grunt) {
               tasks : ['newer:coffee']
           },
           files : ['Gruntfile.js'],
-          tasks : ['newer:coffee','sass']
+          tasks : ['newer:coffee','sass','concat']
       }
 
   });
@@ -48,9 +57,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-sass');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-newer');
 
   // Default task(s).
-  grunt.registerTask('default', ['newer:coffee','sass']);
+  grunt.registerTask('default', ['newer:coffee','sass','concat']);
 
 };
