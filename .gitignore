@@ -1,2 +1,3 @@
-app/.sass-cache
+app/.sass-cache/*
+app/build/*
 .idea
