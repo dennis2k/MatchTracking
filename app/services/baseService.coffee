@@ -36,7 +36,7 @@
       deferred = $q.defer();
       $upload
         .upload({
-                url: 'service.php/games/upload',
+                url: 'service.php/' + @route+ '/upload',
                 method: 'post',
                 file: files[0]
                 })
