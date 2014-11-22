@@ -1,3 +1,5 @@
 app/.sass-cache/*
 app/build/*
+node_modules/*
 .idea
+
