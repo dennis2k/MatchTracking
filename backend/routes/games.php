@@ -34,8 +34,8 @@ $app->post("/$gamesRoot/update",function() use ($app,$gamesCollection) {
         die;
     }
     try {
-        $gamesCollection->update(array('_id' => new MongoId($id)),$jsonDoc,array('upsert' => true));
-        $newDoc = $gamesCollection->findOne(array('_id' => new MongoId($id)));
+        $gamesCollection->update(array('_id' => $id),$jsonDoc,array('upsert' => true));
+        $newDoc = $gamesCollection->findOne(array('_id' => $id));
         JSON::success($newDoc);
     }
     catch(Exception $e) {

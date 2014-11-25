@@ -17,7 +17,6 @@
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="vendor/angular-fileupload.min.js"></script>
-    <script type="text/javascript" src="vendor/linq.min.js"></script>
     <script src="http://178.62.180.69:35729/livereload.js"></script>
 
     <!-- Angular -->
@@ -40,8 +39,8 @@
             <ul class="nav navbar-nav">
                 <li ng-class="{active : nav.isActive('/games')}"><a  href="#/games">Games</a></li>
                 <li ng-class="{active : nav.isActive('/events')}"><a href="#/events">Events</a></li>
-                <li ng-class="{active : nav.isActive('/gamegame')}"><a href="#/gamegame">Do a Game Game</a></li>
-                <li ng-class="{active : nav.isActive('/wishlist')}"><a href="#/wishlist">Wish list</a></li>
+                <li ng-class="{active : nav.isActive('/gamegame')}"><a href="#/gamegame">Game Game</a></li>
+                <!--<li ng-class="{active : nav.isActive('/wishlist')}"><a href="#/wishlist">Wish list</a></li>-->
             </ul>
             <div class="col-sm-3 col-md-3 pull-right">
                 <form class="navbar-form" role="codes" ng-submit="nav.cheat(nav.code)">

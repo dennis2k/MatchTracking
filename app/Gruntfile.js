@@ -32,6 +32,10 @@ module.exports = function(grunt) {
           }
       },
       watch : {
+          concat: {
+              files: ['build/controllers.js', 'build/services.js', 'build/models.js', 'build/directives.js','build/filters.js','build/app.js'],
+              tasks: 'concat'
+          },
           livereload: {
               // Here we watch the files the sass task will compile to
               // These files are sent to the live reload server after sass compiles to them

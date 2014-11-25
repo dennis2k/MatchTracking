@@ -28,33 +28,18 @@ animate.
  the leave event is triggered for the element
  that has the .repeated-item class
 */
-.repeated-item.ng-leave {
-    -webkit-animation:0.5s my_animation;
-    -moz-animation:0.5s my_animation;
-    -o-animation:0.5s my_animation;
-    animation:0.5s my_animation;
+.vanish {
+    -webkit-animation: fadeOut 2s 2s 1 normal forwards ease-out;
+    animation: fadeOut 2s 2s 1 normal forwards ease-out;
 }
 
-@keyframes my_animation {
-    from { opacity:1; }
-    to { opacity:0; }
+@-webkit-keyframes fadeOut {
+    1% { opacity: 1; visibility: visible;}
+    99% { opacity: 0; visibility: visible;}
+    100% { opacity: 0; visibility: hidden; }
 }
-
-/*
- Unfortunately each browser vendor requires
- its own definition of keyframe animation code...
-*/
-@-webkit-keyframes my_animation {
-    from { opacity:1; }
-    to { opacity:0; }
-}
-
-@-moz-keyframes my_animation {
-    from { opacity:1; }
-    to { opacity:0; }
-}
-
-@-o-keyframes my_animation {
-    from { opacity:1; }
-    to { opacity:0; }
+@keyframes fadeOut {
+    1% { opacity: 1; visibility: visible;}
+    99% { opacity: 0; visibility: visible;}
+    100% { opacity: 0; visibility: hidden;}
 }

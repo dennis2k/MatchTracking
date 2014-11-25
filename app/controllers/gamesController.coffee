@@ -4,9 +4,13 @@
   vm.games = gameList.data
   vm.newGame = {}
   saveGame = (game) ->
-    GamesService.insert(game).then((result) ->
-      vm.games.push(result.data) if result.status
-    )
+    if angular.isUndefined(game._id)
+      GamesService.insert(game).then((result) ->
+        vm.games.push(result.data) if result.status
+        console.log("hello")
+      )
+    else
+      GamesService.update({_id : game._id, doc : game} )
   removeGame = (game) ->
     GamesService.delete(game._id).then(() ->
       idx = vm.games.indexOf(game)

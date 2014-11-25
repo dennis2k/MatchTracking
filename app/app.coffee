@@ -2,6 +2,7 @@
   .directive 'aAlert', Alert
   .directive 'enlarge', Enlarge
   .filter 'range', RangeFilter
+  .filter 'games', GamesFilter
   .factory('AlertService',AlertService)
   .factory('Utility',Utility)
   .factory('EventService',EventServiceWrapper)
