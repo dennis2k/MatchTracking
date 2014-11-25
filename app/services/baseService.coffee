@@ -1,4 +1,4 @@
-@BaseServiceWrapper = ($http, $q, $upload) ->
+@BaseServiceWrapper = ($http, $q, $upload,toaster) ->
 
   #All services inherit common API calls
   class @BaseService
@@ -9,19 +9,21 @@
     request = (method,url,params) ->
       params = {} if angular.isUndefined(params)
       deferred = $q.defer();
-      $http({
-            url : 'service.php/' + url,
-            method : method,
-            params : params
-            })
-            .success((response) ->
+      $http {
+              url : 'service.php/' + url
+              method : method
+              params : params
+            }
+            .success (response) ->
+              if response.status && !!response.message
+                toaster.pop "success","Info!", response.message
+              if response.status == false
+                toaster.pop "error","Error!", response.message
               deferred.resolve(response)
-              (response.status && AlertService.info(response.message) || AlertService.error(response.message)) if !!response.message
-            )
-            .error((response) ->
+
+            .error (response) ->
+                toaster.pop "error","Error!", response.message
                 deferred.reject(response)
-                AlertService.error(response.message)
-            )
       deferred.promise;
 
     query : (params) ->

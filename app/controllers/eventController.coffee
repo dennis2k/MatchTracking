@@ -8,7 +8,6 @@
 
   # Load event data
   loadEvent = (event) ->
-    console.log(event)
     params =
       _id : event._id.$id
     EventService.query(params).then((result) ->
@@ -52,12 +51,10 @@
     m.calculateNewRating();
     EventService.addMatch(vm.currentEvent._id.$id,match).then((result) ->
       for player in match.players
-        console.log(player)
         filteredArray = $filter('filter')(vm.currentEvent.players,{name : player.name})
         eventPlayer = filteredArray.pop()
         eventPlayer.rating = player.new_rating
         delete eventPlayer.rank
-#        delete eventPlayer.new_rating
       EventService.updatePlayerRating(vm.currentEvent._id.$id,vm.currentEvent.players)
       vm.currentEvent.matches.push(match);
       vm.match = {};
@@ -68,17 +65,31 @@
     EventService.removeMatch(vm.currentEvent._id.$id,match.uid).then((result) ->
       vm.currentEvent = result.data if result.status
     )
+
+  #Roll back the points given to players paticipating in this game and delete the game
+  revertMatch = (match) ->
+    angular.forEach match.players, (player) ->
+      eventPlayer = $filter('filter')(vm.currentEvent.players,{name : player.name})
+      eventPlayer = eventPlayer.pop()
+      console.log(player)
+      console.log(eventPlayer)
+      eventPlayer.rating = player.rating
+    EventService.updatePlayerRating(vm.currentEvent._id.$id,vm.currentEvent.players).then () ->
+      removeMatch(match)
+
   # Auto complete searching for games
   getGames = (input) ->
     GamesService.findGamesByName(input).then((result) ->
       result.data
     )
 
+  #get the image of a game
   getGameImage = (game) ->
     filteredArray = $filter('filter')(vm.games,{_id : game})
     game = filteredArray.pop()
     game.image_url|| "";
 
+  #Calculate the number of matches for a player
   numMatches = (player) ->
     count = 0
     angular.forEach(vm.currentEvent.matches,(match,mindex) ->
@@ -96,14 +107,12 @@
   vm.removePlayer = removePlayer
   vm.addMatch = addMatch
   vm.removeMatch = removeMatch
+  vm.revertMatch = revertMatch
   vm.getGames = getGames
   vm.getGameImage = getGameImage
   vm.numMatches = numMatches
   vm.canEdit = $rootScope.edit ? true : false;
-
-
   vm
-
 EventController.resolve =
   eventList : (EventService) ->
     EventService.query()

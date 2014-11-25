@@ -15,7 +15,7 @@ $app->post("/$eventsRoot/create",function() use ($app,$eventCollection) {
 
     try {
         $eventCollection->insert($event);
-        JSON::success($event);
+        JSON::success($event,"Event created!");
     }
     catch(Exception $e) {
         JSON::error($e->getMessage());

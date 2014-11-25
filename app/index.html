@@ -4,8 +4,10 @@
     <title>MatchTracker</title>
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="bower_components/AngularJS-Toaster/toaster.css" type="text/css">
     <link rel="stylesheet" href="css/style.css" type="text/css">
     <link rel="stylesheet" href="css/animation.css" type="text/css">
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
 
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
@@ -16,6 +18,7 @@
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="bower_components/AngularJS-Toaster/toaster.js"></script>
     <script type="text/javascript" src="vendor/angular-fileupload.min.js"></script>
     <script src="http://178.62.180.69:35729/livereload.js"></script>
 
@@ -52,9 +55,7 @@
         </div><!--/.nav-collapse -->
     </div>
 </div>
-<div class="row3-container-fluid alert-fixed-top">
-    <a-alert templateUrl="templates/alert.tpl.html"></a-alert>
-</div>
+<toaster-container toaster-options="{'time-out': 3000, 'close-button':true, 'animation-class': 'toast-top-center'}"></toaster-container>
 <div class="container" style="margin-top: 10px" ng-view="" >
 </div>
 

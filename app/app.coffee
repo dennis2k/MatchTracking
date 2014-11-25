@@ -1,4 +1,4 @@
-@app = angular.module('matchtracker',['ngRoute','ngResource','ngAnimate','ui.bootstrap','angularFileUpload'])
+@app = angular.module('matchtracker',['ngRoute','ngResource','ngAnimate','ui.bootstrap','angularFileUpload','toaster'])
   .directive 'aAlert', Alert
   .directive 'enlarge', Enlarge
   .filter 'range', RangeFilter
@@ -26,5 +26,5 @@
     $routeProvider.otherwise({redirectTo: '/events'})
   )
   .run(($rootScope) ->
-    $rootScope.edit = false
+    $rootScope.edit = true
   )

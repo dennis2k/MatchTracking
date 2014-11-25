@@ -133,7 +133,7 @@
                 <div class="box-padding-md">
                     <div class="panel panel-primary" ng-repeat="match in vm.currentEvent.matches | orderBy:'timestamp':true">
                         <div class="panel-heading">
-                            <h3 class="panel-title">{{ match.game }} <a ng-show="vm.root.edit" class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeMatch(match)"></span> </a></h3>
+                            <h3 class="panel-title">{{ match.game }} <a ng-show="vm.root.edit" class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeMatch(match)"></span> </a> <a ng-show="vm.root.edit" class="btn btn-xs btn-info pull-right pad"><span class="glyphicon glyphicon-backward" ng-click="vm.revertMatch(match)"></span> </a></h3>
                         </div>
                         <div class="panel-body">
                             <div class="row">
