@@ -12,7 +12,7 @@
 <p>Use bower to install dependencies <b>bower install angular</b></p>
 
 <h1>Planned features</h1>
-<p>Improve selection design of game game so that one can choose number of players and game game will only list available games.</p>
+<p><delete>Improve selection design of game game so that one can choose number of players and game game will only list available games.</delete></p>
 <p>Fix animation when running a game game to make it more visible which game is eleminated</p>
 <p>Show wins count for each player on the scoreboard</p>
 <p>Functionality to rollback a registered match</p>
