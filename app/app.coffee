@@ -26,5 +26,5 @@
     $routeProvider.otherwise({redirectTo: '/events'})
   )
   .run(($rootScope) ->
-    $rootScope.edit = true
+    $rootScope.edit = false
   )
