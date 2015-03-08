@@ -1,37 +1,86 @@
-/*
-Error: Inconsistent indentation: 3 spaces were used for indentation, but the rest of the document was indented using 2 spaces.
-        on line 87 of sass/style.sass
+.shadow {
+    box-shadow: 5px 5px 5px #888888; }
 
-82: +keyframes('fade-out')
-83:   0%
-84:     opacity: 1
-85:     -webkit-transform: scale(1)
-86:   85%
-87:    opacity: 1
-88:     -webkit-transform: scale(1.05)
-89:   100%
-90:     -webkit-transform: scale(.1)
-91:     opacity: 0
-92: 
+.content-box {
+    margin-top: 70px;
+    padding: 20px; }
 
-Backtrace:
-sass/style.sass:87
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:473:in `block in tabulate'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:431:in `each'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:431:in `each_with_index'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:431:in `tabulate'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:396:in `_to_tree'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:368:in `_render_with_sourcemap'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/engine.rb:285:in `render_with_sourcemap'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/exec/sass_scss.rb:396:in `run'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/exec/sass_scss.rb:62:in `process_result'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/exec/base.rb:52:in `parse'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/lib/sass/exec/base.rb:19:in `parse!'
-/usr/lib/ruby/gems/1.9.1/gems/sass-3.4.5/bin/sass:13:in `<top (required)>'
-/usr/local/bin/sass:23:in `load'
-/usr/local/bin/sass:23:in `<main>'
-*/
-body:before {
-  white-space: pre;
-  font-family: monospace;
-  content: "Error: Inconsistent indentation: 3 spaces were used for indentation, but the rest of the document was indented using 2 spaces.\A         on line 87 of sass/style.sass\A \A 82: +keyframes('fade-out')\A 83:   0%\A 84:     opacity: 1\A 85:     -webkit-transform: scale(1)\A 86:   85%\A 87:    opacity: 1\A 88:     -webkit-transform: scale(1.05)\A 89:   100%\A 90:     -webkit-transform: scale(.1)\A 91:     opacity: 0\A 92: "; }
+.section {
+    height: 20px;
+    width: 100%; }
+
+.inline, .inline-small, .inline-medium {
+    display: inline; }
+
+.box-padding-sm {
+    padding: 10px; }
+
+.box-padding-md, .event-container {
+    padding: 20px; }
+
+.inline-small {
+    width: 70px; }
+
+.inline-medium {
+    width: 100px; }
+
+.event-container {
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    border-radius: 10px;
+    box-shadow: 10px 10px 5px #888888;
+    border: 1px solid black; }
+
+.drag-drop-files {
+    width: 200px;
+    height: 80px;
+    background-color: #428bca;
+    opacity: 0.3;
+    border: 2px dashed grey;
+    border-radius: 25px; }
+
+.drag-drop-files-over {
+    opacity: 0.7; }
+
+.alert-fixed-top {
+    position: fixed;
+    margin-top: 60px;
+    height: 52px;
+    width: 100%;
+    z-index: 10000; }
+
+.gamegame-entry {
+    margin: 10px; }
+
+.animate.ng-enter,
+.animate.ng-leave {
+    -webkit-transition: 400ms cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
+    -moz-transition: 400ms cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
+    -ms-transition: 400ms cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
+    -o-transition: 400ms cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
+    transition: 400ms cubic-bezier(0.25, 0.25, 0.75, 0.75) all;
+    position: relative;
+    display: block; }
+
+.animate.ng-leave.animate.ng-leave-active,
+.animate.ng-enter {
+    -webkit-transform: rotateX(90deg) rotateZ(90deg);
+    -moz-transform: rotateX(90deg) rotateZ(90deg);
+    -ms-transform: rotateX(90deg) rotateZ(90deg);
+    -o-transform: rotateX(90deg) rotateZ(90deg);
+    transform: rotateX(90deg) rotateZ(90deg);
+    opacity: 0;
+    height: 0px; }
+
+.animate.ng-enter.animate.ng-enter-active,
+.animate.ng-leave {
+    -webkit-transform: rotateX(0deg) rotateZ(0deg);
+    -moz-transform: rotateX(0deg) rotateZ(0deg);
+    -ms-transform: rotateX(0deg) rotateZ(0deg);
+    -o-transform: rotateX(0deg) rotateZ(0deg);
+    transform: rotateX(0deg) rotateZ(0deg);
+    opacity: 1;
+    height: 30px; }
+
+/*# sourceMappingURL=style.css.map */
