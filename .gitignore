@@ -1,5 +1,7 @@
-app/.sass-cache/*
-app/build/*
-node_modules/*
+app/.sass-cache
+app/dist
+app/bower_components
+aa/node_modules
 .idea
+
 
