@@ -48,12 +48,13 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   ```javascript
   /* avoid */
- var module angular.module('MyModule',[])
+ var module = angular.module('MyModule',[])
 
  class MyModuleController extends BaseController
-    ....
-    ....
+    @register(module)
+
  class MyModuleService extends BaseService
+    @register(module)
 
   ```
 
@@ -78,76 +79,11 @@ This guide describes best pratices and provides guidance to build our angular ap
   ```javascript
   /* recommended */
 
-  // myservice.service.js
+  // myservice.service.coffee
   class MyService extends BaseService
       @register(angular.module('mymodule'))
 
   ```
-
-**[Back to top](#table-of-contents)**
-
-## IIFE
-### JavaScript Closures
-###### [Style [Y010](#style-y010)]
-
-  - Wrap Angular components in an Immediately Invoked Function Expression (IIFE).
-
-  *Why?*: An IIFE removes variables from the global scope. This helps prevent variables and function declarations from living longer than expected in the global scope, which also helps avoid variable collisions.
-
-  *Why?*: When your code is minified and bundled into a single file for deployment to a production server, you could have collisions of variables and many global variables. An IIFE protects you against both of these by providing variable scope for each file.
-
-  ```javascript
-  /* avoid */
-  // logger.js
-  angular
-      .module('app')
-      .factory('logger', logger);
-
-  // logger function is added as a global variable
-  function logger() { }
-
-  // storage.js
-  angular
-      .module('app')
-      .factory('storage', storage);
-
-  // storage function is added as a global variable
-  function storage() { }
-  ```
-
-  ```javascript
-  /**
-   * recommended
-   *
-   * no globals are left behind
-   */
-
-  // logger.js
-  (function() {
-      'use strict';
-
-      angular
-          .module('app')
-          .factory('logger', logger);
-
-      function logger() { }
-  })();
-
-  // storage.js
-  (function() {
-      'use strict';
-
-      angular
-          .module('app')
-          .factory('storage', storage);
-
-      function storage() { }
-  })();
-  ```
-
-  - Note: For brevity only, the rest of the examples in this guide may omit the IIFE syntax.
-
-  - Note: IIFE's prevent test code from reaching private members like regular expressions or helper functions which are often good to unit test directly on their own. However you can test these through accessible members or by exposing them through their own component. For example placing helper functions, regular expressions or constants in their own factory or constant.
 
 **[Back to top](#table-of-contents)**
 
@@ -160,16 +96,16 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   *Why?*: Unique names help avoid module name collisions. Separators help define modules and their submodule hierarchy. For example `app` may be your root module while `app.dashboard` and `app.users` may be modules that are used as dependencies of `app`.
 
-### Definitions (aka Setters)
+### Definitions
 ###### [Style [Y021](#style-y021)]
 
-  - Declare modules without a variable using the setter syntax.
+  - Declare modules without a variable
 
   *Why?*: With 1 component per file, there is rarely a need to introduce a variable for the module.
 
   ```javascript
   /* avoid */
-  var app = angular.module('app', [
+  app = angular.module('app', [
       'ngAnimate',
       'ngRoute',
       'app.shared',
@@ -190,7 +126,7 @@ This guide describes best pratices and provides guidance to build our angular ap
       ]);
   ```
 
-### Getters
+### Getting modules
 ###### [Style [Y022](#style-y022)]
 
   - When using a module, avoid using a variable and instead use chaining with the getter syntax.
@@ -199,19 +135,18 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   ```javascript
   /* avoid */
-  var app = angular.module('app');
-  app.controller('SomeController', SomeController);
+  app = angular.module('app');
 
-  function SomeController() { }
+  class MyController
+    @register(app)
+
   ```
 
   ```javascript
   /* recommended */
-  angular
-      .module('app')
-      .controller('SomeController', SomeController);
+  class MyController extends BaseController
+    @register(angular.module('app'))
 
-  function SomeController() { }
   ```
 
 ### Setting vs Getting
@@ -223,43 +158,6 @@ This guide describes best pratices and provides guidance to build our angular ap
 
     - Use `angular.module('app', []);` to set a module.
     - Use `angular.module('app');` to get a module.
-
-### Named vs Anonymous Functions
-###### [Style [Y024](#style-y024)]
-
-  - Use named functions instead of passing an anonymous function in as a callback.
-
-  *Why?*: This produces more readable code, is much easier to debug, and reduces the amount of nested callback code.
-
-  ```javascript
-  /* avoid */
-  angular
-      .module('app')
-      .controller('Dashboard', function() { })
-      .factory('logger', function() { });
-  ```
-
-  ```javascript
-  /* recommended */
-
-  // dashboard.js
-  angular
-      .module('app')
-      .controller('Dashboard', Dashboard);
-
-  function Dashboard() { }
-  ```
-
-  ```javascript
-  // logger.js
-  angular
-      .module('app')
-      .factory('logger', logger);
-
-  function logger() { }
-  ```
-
-**[Back to top](#table-of-contents)**
 
 ## Controllers
 
