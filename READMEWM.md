@@ -48,13 +48,11 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   ```javascript
   /* avoid */
- var module angular.module('MyModule',[])
+ angular.module
 
- class MyModuleController extends BaseController
-    ....
-    ....
- class MyModuleService extends BaseService
+  function SomeController() { }
 
+  function someFactory() { }
   ```
 
   The same components are now separated into their own files.
@@ -62,26 +60,31 @@ This guide describes best pratices and provides guidance to build our angular ap
   ```javascript
   /* recommended */
 
-  // mymodule.module.coffee
-  angular.module('mymodule', [])
+  // app.module.js
+  angular
+      .module('app', ['ngRoute']);
   ```
 
   ```javascript
   /* recommended */
 
-  // mycontroller.controller.coffee
-  class MyController extends BaseController
-    @register(angular.module('mymodule'))
+  // someController.js
+  angular
+      .module('app')
+      .controller('SomeController', SomeController);
 
+  function SomeController() { }
   ```
 
   ```javascript
   /* recommended */
 
-  // myservice.service.js
-  class MyService extends BaseService
-      @register(angular.module('mymodule'))
+  // someFactory.js
+  angular
+      .module('app')
+      .factory('someFactory', someFactory);
 
+  function someFactory() { }
   ```
 
 **[Back to top](#table-of-contents)**
