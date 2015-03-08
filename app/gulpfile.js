@@ -35,14 +35,13 @@ var continueOnError = function(stream) {
 gulp.task('build', function () {
     return gulp.src(src.coffee.all)
         .pipe(continueOnError(coffee({bare:true})).on('error', gutil.log))
-        .pipe(concat('matchtrackeromfg.js'))
+        .pipe(concat('matchtracker.js'))
         .pipe(gulp.dest(dist.javascript));
 });
 
-gulp.task('watch', function () {
+gulp.task('watcher', function () {
     gulp.watch(src.coffee.all, ['build']);
-    gulp.watch(src.coffee.app, ['build']);
 })
-gulp.task('watch', ['build', 'watch']);
+gulp.task('watch', ['build','watcher']);
 
 gulp.task('default', ['build']);
