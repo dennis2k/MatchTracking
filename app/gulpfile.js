@@ -3,19 +3,18 @@ var gulp = require('gulp')
     gutil = require('gulp-util'),
     sass = require('gulp-sass'),
     concat = require('gulp-concat');
+
 src = {
     'coffee': {
         'all': ['controllers/*.coffee','services/*.coffee','models/*.coffee','directives/*.coffee','filters/*.coffee','app.coffee']
     },
-    'sass' : 'sass/*.sass'
+    'sass' : 'sass/style.sass'
 }
 
 dist = {
     'css': 'css/',
     'javascript': 'dist/'
 }
-
-
 
 // clean stream of onerror
 var cleaner = function(stream) {
@@ -43,7 +42,7 @@ gulp.task('build', function () {
 
 gulp.task('sass', function () {
     gulp.src(src.sass)
-        .pipe(sass())
+        .pipe(sass({indentedSyntax: true}))
         .pipe(gulp.dest(dist.css));
 });
 
