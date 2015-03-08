@@ -5,7 +5,6 @@ This guide describes best pratices and provides guidance to build our angular ap
 ## Table of Contents
 
   1. [Single Responsibility](#single-responsibility)
-  1. [IIFE](#iife)
   1. [Modules](#modules)
   1. [Controllers](#controllers)
   1. [Services](#services)
@@ -149,16 +148,6 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   ```
 
-### Setting vs Getting
-###### [Style [Y023](#style-y023)]
-
-  - Only set once and get for all other instances.
-
-  *Why?*: A module should only be created once, then retrieved from that point and after.
-
-    - Use `angular.module('app', []);` to set a module.
-    - Use `angular.module('app');` to get a module.
-
 ## Controllers
 
 ### controllerAs View Syntax
@@ -186,33 +175,6 @@ This guide describes best pratices and provides guidance to build our angular ap
   </div>
   ```
 
-### controllerAs Controller Syntax
-###### [Style [Y031](#style-y031)]
-
-  - Use the `controllerAs` syntax over the `classic controller with $scope` syntax.
-
-  - The `controllerAs` syntax uses `this` inside controllers which gets bound to `$scope`
-
-  *Why?*: `controllerAs` is syntactic sugar over `$scope`. You can still bind to the View and still access `$scope` methods.
-
-  *Why?*: Helps avoid the temptation of using `$scope` methods inside a controller when it may otherwise be better to avoid them or move them to a factory. Consider using `$scope` in a factory, or if in a controller just when needed. For example when publishing and subscribing events using [`$emit`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$emit), [`$broadcast`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$broadcast), or [`$on`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$on) consider moving these uses to a factory and invoke from the controller.
-
-  ```javascript
-  /* avoid */
-  function Customer($scope) {
-      $scope.name = {};
-      $scope.sendMessage = function() { };
-  }
-  ```
-
-  ```javascript
-  /* recommended - but see next section */
-  function Customer() {
-      this.name = {};
-      this.sendMessage = function() { };
-  }
-  ```
-
 ### controllerAs with vm
 ###### [Style [Y032](#style-y032)]
 
@@ -222,28 +184,25 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   ```javascript
   /* avoid */
-  function Customer() {
-      this.name = {};
-      this.sendMessage = function() { };
-  }
+    class MyController extends BaseController
+        @inject('$scope')
+
+        initialize : () ->
+            @$scope.name = 'John Doe'
+
   ```
 
   ```javascript
   /* recommended */
-  function Customer() {
-      var vm = this;
-      vm.name = {};
-      vm.sendMessage = function() { };
-  }
+  class MyController extends BaseControllerAs
+
+      vm = {}
+      initialize : () ->
+          vm = @
+          vm.name = 'John Doe'
+
   ```
-
-  Note: You can avoid any [jshint](http://www.jshint.com/) warnings by placing the comment below above the line of code. However it is not needed when the function is named using UpperCasing, as this convention means it is a constructor function, which is what a controller is in Angular.
-
-  ```javascript
-  /* jshint validthis: true */
-  var vm = this;
-  ```
-
+  You should only need to inject the $scope when you need to use watches or listen to broadcast messages
   Note: When creating watches in a controller using `controller as`, you can watch the `vm.*` member using the following syntax. (Create watches with caution as they add more load to the digest cycle.)
 
   ```html
@@ -251,514 +210,80 @@ This guide describes best pratices and provides guidance to build our angular ap
   ```
 
   ```javascript
-  function SomeController($scope, $log) {
-      var vm = this;
-      vm.title = 'Some Title';
 
-      $scope.$watch('vm.title', function(current, original) {
-          $log.info('vm.title was %s', original);
-          $log.info('vm.title is now %s', current);
-      });
-  }
+  $scope.$watch('vm.title', function(current, original) {
+      $log.info('vm.title was %s', original);
+      $log.info('vm.title is now %s', current);
+  });
+
   ```
 
-### Bindable Members Up Top
-###### [Style [Y033](#style-y033)]
-
-  - Place bindable members at the top of the controller, alphabetized, and not spread through the controller code.
-
-    *Why?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View.
-
-    *Why?*: Setting anonymous functions in-line can be easy, but when those functions are more than 1 line of code they can reduce the readability. Defining the functions below the bindable members (the functions will be hoisted) moves the implementation details down, keeps the bindable members up top, and makes it easier to read.
-
-  ```javascript
-  /* avoid */
-  function Sessions() {
-      var vm = this;
-
-      vm.gotoSession = function() {
-        /* ... */
-      };
-      vm.refresh = function() {
-        /* ... */
-      };
-      vm.search = function() {
-        /* ... */
-      };
-      vm.sessions = [];
-      vm.title = 'Sessions';
-  ```
-
-  ```javascript
-  /* recommended */
-  function Sessions() {
-      var vm = this;
-
-      vm.gotoSession = gotoSession;
-      vm.refresh = refresh;
-      vm.search = search;
-      vm.sessions = [];
-      vm.title = 'Sessions';
-
-      ////////////
-
-      function gotoSession() {
-        /* */
-      }
-
-      function refresh() {
-        /* */
-      }
-
-      function search() {
-        /* */
-      }
-  ```
-
-    ![Controller Using "Above the Fold"](https://raw.githubusercontent.com/johnpapa/angular-styleguide/master/assets/above-the-fold-1.png)
-
-  Note: If the function is a 1 liner consider keeping it right up top, as long as readability is not affected.
-
-  ```javascript
-  /* avoid */
-  function Sessions(data) {
-      var vm = this;
-
-      vm.gotoSession = gotoSession;
-      vm.refresh = function() {
-          /**
-           * lines
-           * of
-           * code
-           * affects
-           * readability
-           */
-      };
-      vm.search = search;
-      vm.sessions = [];
-      vm.title = 'Sessions';
-  ```
-
-  ```javascript
-  /* recommended */
-  function Sessions(dataservice) {
-      var vm = this;
-
-      vm.gotoSession = gotoSession;
-      vm.refresh = dataservice.refresh; // 1 liner is OK
-      vm.search = search;
-      vm.sessions = [];
-      vm.title = 'Sessions';
-  ```
-
-### Function Declarations to Hide Implementation Details
-###### [Style [Y034](#style-y034)]
-
-  - Use function declarations to hide implementation details. Keep your bindable members up top. When you need to bind a function in a controller, point it to a function declaration that appears later in the file. This is tied directly to the section Bindable Members Up Top. For more details see [this post](http://www.johnpapa.net/angular-function-declarations-function-expressions-and-readable-code).
-
-    *Why?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View. (Same as above.)
-
-    *Why?*: Placing the implementation details of a function later in the file moves that complexity out of view so you can see the important stuff up top.
-
-    *Why?*: Function declaration are hoisted so there are no concerns over using a function before it is defined (as there would be with function expressions).
-
-    *Why?*: You never have to worry with function declarations that moving `var a` before `var b` will break your code because `a` depends on `b`.
-
-    *Why?*: Order is critical with function expressions
-
-  ```javascript
-  /**
-   * avoid
-   * Using function expressions.
-   */
-  function Avengers(dataservice, logger) {
-      var vm = this;
-      vm.avengers = [];
-      vm.title = 'Avengers';
-
-      var activate = function() {
-          return getAvengers().then(function() {
-              logger.info('Activated Avengers View');
-          });
-      }
-
-      var getAvengers = function() {
-          return dataservice.getAvengers().then(function(data) {
-              vm.avengers = data;
-              return vm.avengers;
-          });
-      }
-
-      vm.getAvengers = getAvengers;
-
-      activate();
-  }
-  ```
-
-  Notice that the important stuff is scattered in the preceding example. In the example below, notice that the important stuff is up top. For example, the members bound to the controller such as `vm.avengers` and `vm.title`. The implementation details are down below. This is just easier to read.
-
-  ```javascript
-  /*
-   * recommend
-   * Using function declarations
-   * and bindable members up top.
-   */
-  function Avengers(dataservice, logger) {
-      var vm = this;
-      vm.avengers = [];
-      vm.getAvengers = getAvengers;
-      vm.title = 'Avengers';
-
-      activate();
-
-      function activate() {
-          return getAvengers().then(function() {
-              logger.info('Activated Avengers View');
-          });
-      }
-
-      function getAvengers() {
-          return dataservice.getAvengers().then(function(data) {
-              vm.avengers = data;
-              return vm.avengers;
-          });
-      }
-  }
-  ```
 
 ### Defer Controller Logic to Services
 ###### [Style [Y035](#style-y035)]
 
-  - Defer logic in a controller by delegating to services and factories.
+  - Defer logic in a controller by delegating to services (never use $http in a controller directly)
 
-    *Why?*: Logic may be reused by multiple controllers when placed within a service and exposed via a function.
+    Logic may be reused by multiple controllers when placed within a service and exposed via a function.
 
-    *Why?*: Logic in a service can more easily be isolated in a unit test, while the calling logic in the controller can be easily mocked.
+    Logic in a service can more easily be isolated in a unit test, while the calling logic in the controller can be easily mocked.
 
-    *Why?*: Removes dependencies and hides implementation details from the controller.
+    It Removes dependencies and hides implementation details from the controller.
 
-    *Why?*: Keeps the controller slim, trim, and focused.
+    It Keeps the controller slim, trim, and focused.
 
   ```javascript
 
   /* avoid */
-  function Order($http, $q, config, userInfo) {
-      var vm = this;
-      vm.checkCredit = checkCredit;
+  class OrderController extends BaseController
+    @inject('$http', '$q', 'config', 'userInfo')
+    vm = {}
+    initialize : () ->
+      vm = @
       vm.isCreditOk;
       vm.total = 0;
 
-      function checkCredit() {
-          var settings = {};
-          // Get the credit service base URL from config
-          // Set credit service required headers
-          // Prepare URL query string or data object with request data
-          // Add user-identifying info so service gets the right credit limit for this user.
-          // Use JSONP for this browser if it doesn't support CORS
-          return $http.get(settings)
-              .then(function(data) {
-               // Unpack JSON data in the response object
-                 // to find maxRemainingAmount
-                 vm.isCreditOk = vm.total <= maxRemainingAmount
-              })
-              .catch(function(error) {
-                 // Interpret error
-                 // Cope w/ timeout? retry? try alternate service?
-                 // Re-reject with appropriate error for a user to see
-              });
-      };
-  }
+
+    checkCredit : () ->
+      settings = {cardType : 'VISA'}
+      $http.get(settings).then((response) ->
+         vm.isCreditOk = vm.total <= response.maxRemainingAmount
+      )
   ```
 
   ```javascript
   /* recommended */
-  function Order(creditService) {
-      var vm = this;
-      vm.checkCredit = checkCredit;
+  class OrderController extends BaseController
+    @inject('CreditService')
+    vm = {}
+
+    initialize : () ->
+      vm = @
       vm.isCreditOk;
       vm.total = 0;
 
-      function checkCredit() {
-         return creditService.isOrderTotalOk(vm.total)
-      .then(function(isOk) { vm.isCreditOk = isOk; })
-            .catch(showServiceError);
-      };
-  }
+    checkCredit () ->
+         vm.CreditService.isOrderTotalOk(vm.total).then((response) ->
+            vm.isCreditOk = repsonse.isOK;
+         )
   ```
 
 ### Keep Controllers Focused
 ###### [Style [Y037](#style-y037)]
 
-  - Define a controller for a view, and try not to reuse the controller for other views. Instead, move reusable logic to factories and keep the controller simple and focused on its view.
-
-    *Why?*: Reusing controllers with several views is brittle and good end to end (e2e) test coverage is required to ensure stability across large applications.
-
-### Assigning Controllers
-###### [Style [Y038](#style-y038)]
-
-  - When a controller must be paired with a view and either component may be re-used by other controllers or views, define controllers along with their routes.
-
-    Note: If a View is loaded via another means besides a route, then use the `ng-controller="Avengers as vm"` syntax.
-
-    *Why?*: Pairing the controller in the route allows different routes to invoke different pairs of controllers and views. When controllers are assigned in the view using [`ng-controller`](https://docs.angularjs.org/api/ng/directive/ngController), that view is always associated with the same controller.
-
- ```javascript
-  /* avoid - when using with a route and dynamic pairing is desired */
-
-  // route-config.js
-  angular
-      .module('app')
-      .config(config);
-
-  function config($routeProvider) {
-      $routeProvider
-          .when('/avengers', {
-            templateUrl: 'avengers.html'
-          });
-  }
-  ```
-
-  ```html
-  <!-- avengers.html -->
-  <div ng-controller="Avengers as vm">
-  </div>
-  ```
-
-  ```javascript
-  /* recommended */
-
-  // route-config.js
-  angular
-      .module('app')
-      .config(config);
-
-  function config($routeProvider) {
-      $routeProvider
-          .when('/avengers', {
-              templateUrl: 'avengers.html',
-              controller: 'Avengers',
-              controllerAs: 'vm'
-          });
-  }
-  ```
-
-  ```html
-  <!-- avengers.html -->
-  <div>
-  </div>
-  ```
-
-**[Back to top](#table-of-contents)**
+  - Define a controller for a view, and try not to reuse the controller for other views. Instead, move reusable logic to services and keep the controller simple and focused on its view.
+    See a controller as a air plane control tower that just coordinate planes (user inputs) and direct them to the correct gate (service)
+    Do not use any dom interaction within a controller - this should be separated into a directive instead.
 
 ## Services
 
 ### Singletons
-###### [Style [Y040](#style-y040)]
-
-  - Services are instantiated with the `new` keyword, use `this` for public methods and variables. Since these are so similar to factories, use a factory instead for consistency.
-
-    Note: [All Angular services are singletons](https://docs.angularjs.org/guide/services). This means that there is only one instance of a given service per injector.
-
-  ```javascript
-  // service
-  angular
-      .module('app')
-      .service('logger', logger);
-
-  function logger() {
-    this.logError = function(msg) {
-      /* */
-    };
-  }
-  ```
-
-  ```javascript
-  // factory
-  angular
-      .module('app')
-      .factory('logger', logger);
-
-  function logger() {
-      return {
-          logError: function(msg) {
-            /* */
-          }
-     };
-  }
-  ```
-
-**[Back to top](#table-of-contents)**
-
-## Factories
-
-### Single Responsibility
-###### [Style [Y050](#style-y050)]
-
-  - Factories should have a [single responsibility](http://en.wikipedia.org/wiki/Single_responsibility_principle), that is encapsulated by its context. Once a factory begins to exceed that singular purpose, a new factory should be created.
-
-### Singletons
 ###### [Style [Y051](#style-y051)]
 
-  - Factories are singletons and return an object that contains the members of the service.
+  - Services are singletons and return an object that contains the members of the service.
 
     Note: [All Angular services are singletons](https://docs.angularjs.org/guide/services).
 
-### Accessible Members Up Top
-###### [Style [Y052](#style-y052)]
-
-  - Expose the callable members of the service (its interface) at the top, using a technique derived from the [Revealing Module Pattern](http://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript).
-
-    *Why?*: Placing the callable members at the top makes it easy to read and helps you instantly identify which members of the service can be called and must be unit tested (and/or mocked).
-
-    *Why?*: This is especially helpful when the file gets longer as it helps avoid the need to scroll to see what is exposed.
-
-    *Why?*: Setting functions as you go can be easy, but when those functions are more than 1 line of code they can reduce the readability and cause more scrolling. Defining the callable interface via the returned service moves the implementation details down, keeps the callable interface up top, and makes it easier to read.
-
-  ```javascript
-  /* avoid */
-  function dataService() {
-    var someValue = '';
-    function save() {
-      /* */
-    };
-    function validate() {
-      /* */
-    };
-
-    return {
-        save: save,
-        someValue: someValue,
-        validate: validate
-    };
-  }
-  ```
-
-  ```javascript
-  /* recommended */
-  function dataService() {
-      var someValue = '';
-      var service = {
-          save: save,
-          someValue: someValue,
-          validate: validate
-      };
-      return service;
-
-      ////////////
-
-      function save() {
-          /* */
-      };
-
-      function validate() {
-          /* */
-      };
-  }
-  ```
-
-  This way bindings are mirrored across the host object, primitive values cannot update alone using the revealing module pattern
-
-    ![Factories Using "Above the Fold"](https://raw.githubusercontent.com/johnpapa/angular-styleguide/master/assets/above-the-fold-2.png)
-
-### Function Declarations to Hide Implementation Details
-###### [Style [Y053](#style-y053)]
-
-  - Use function declarations to hide implementation details. Keep your accessible members of the factory up top. Point those to function declarations that appears later in the file. For more details see [this post](http://www.johnpapa.net/angular-function-declarations-function-expressions-and-readable-code).
-
-    *Why?*: Placing accessible members at the top makes it easy to read and helps you instantly identify which functions of the factory you can access externally.
-
-    *Why?*: Placing the implementation details of a function later in the file moves that complexity out of view so you can see the important stuff up top.
-
-    *Why?*: Function declaration are hoisted so there are no concerns over using a function before it is defined (as there would be with function expressions).
-
-    *Why?*: You never have to worry with function declarations that moving `var a` before `var b` will break your code because `a` depends on `b`.
-
-    *Why?*: Order is critical with function expressions
-
-  ```javascript
-  /**
-   * avoid
-   * Using function expressions
-   */
-   function dataservice($http, $location, $q, exception, logger) {
-      var isPrimed = false;
-      var primePromise;
-
-      var getAvengers = function() {
-          // implementation details go here
-      };
-
-      var getAvengerCount = function() {
-          // implementation details go here
-      };
-
-      var getAvengersCast = function() {
-         // implementation details go here
-      };
-
-      var prime = function() {
-         // implementation details go here
-      };
-
-      var ready = function(nextPromises) {
-          // implementation details go here
-      };
-
-      var service = {
-          getAvengersCast: getAvengersCast,
-          getAvengerCount: getAvengerCount,
-          getAvengers: getAvengers,
-          ready: ready
-      };
-
-      return service;
-  }
-  ```
-
-  ```javascript
-  /**
-   * recommended
-   * Using function declarations
-   * and accessible members up top.
-   */
-  function dataservice($http, $location, $q, exception, logger) {
-      var isPrimed = false;
-      var primePromise;
-
-      var service = {
-          getAvengersCast: getAvengersCast,
-          getAvengerCount: getAvengerCount,
-          getAvengers: getAvengers,
-          ready: ready
-      };
-
-      return service;
-
-      ////////////
-
-      function getAvengers() {
-          // implementation details go here
-      }
-
-      function getAvengerCount() {
-          // implementation details go here
-      }
-
-      function getAvengersCast() {
-          // implementation details go here
-      }
-
-      function prime() {
-          // implementation details go here
-      }
-
-      function ready(nextPromises) {
-          // implementation details go here
-      }
-  }
-  ```
-
-**[Back to top](#table-of-contents)**
 
 ## Data Services
 
@@ -767,41 +292,21 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   - Refactor logic for making data operations and interacting with data to a factory. Make data services responsible for XHR calls, local storage, stashing in memory, or any other data operations.
 
-    *Why?*: The controller's responsibility is for the presentation and gathering of information for the view. It should not care how it gets the data, just that it knows who to ask for it. Separating the data services moves the logic on how to get it to the data service, and lets the controller be simpler and more focused on the view.
+    The controller's responsibility is for the presentation and gathering of information for the view only. It should not care how it gets the data, just that it knows who to ask for it. Separating the data services moves the logic on how to get it to the data service, and lets the controller be simpler and more focused on the view.
 
-    *Why?*: This makes it easier to test (mock or real) the data calls when testing a controller that uses a data service.
+    This makes it easier to test (mock or real) the data calls when testing a controller that uses a data service.
 
-    *Why?*: Data service implementation may have very specific code to handle the data repository. This may include headers, how to talk to the data, or other services such as $http. Separating the logic into a data service encapsulates this logic in a single place hiding the implementation from the outside consumers (perhaps a controller), also making it easier to change the implementation.
+    Data service implementation may have very specific code to handle the data repository. This may include headers, how to talk to the data, or other services such as $http. Separating the logic into a data service encapsulates this logic in a single place hiding the implementation from the outside consumers (perhaps a controller), also making it easier to change the implementation.
 
   ```javascript
   /* recommended */
 
-  // dataservice factory
-  angular
-      .module('app.core')
-      .factory('dataservice', dataservice);
+  class DataService extends BaseService
+    @inject('$http', 'logger')
 
-  dataservice.$inject = ['$http', 'logger'];
+    getAvengers : () ->
+        @$http.get('/api/avengers')
 
-  function dataservice($http, logger) {
-      return {
-          getAvengers: getAvengers
-      };
-
-      function getAvengers() {
-          return $http.get('/api/maa')
-              .then(getAvengersComplete)
-              .catch(getAvengersFailed);
-
-          function getAvengersComplete(response) {
-              return response.data.results;
-          }
-
-          function getAvengersFailed(error) {
-              logger.error('XHR Failed for getAvengers.' + error.data);
-          }
-      }
-  }
   ```
 
     Note: The data service is called from consumers, such as a controller, hiding the implementation from the consumers, as shown below.
@@ -810,251 +315,73 @@ This guide describes best pratices and provides guidance to build our angular ap
   /* recommended */
 
   // controller calling the dataservice factory
-  angular
-      .module('app.avengers')
-      .controller('Avengers', Avengers);
 
-  Avengers.$inject = ['dataservice', 'logger'];
+  class AvengersController extends BaseController
+    @inject('DataService')
+    vm = {}
 
-  function Avengers(dataservice, logger) {
-      var vm = this;
-      vm.avengers = [];
+    initialize : () ->
+        vm = @
+        vm.avengers = []
 
-      activate();
+    getAvengers : () ->
+      vm.DataService.getAvengers().then((data) ->
+          vm.avengers = data
+      )
 
-      function activate() {
-          return getAvengers().then(function() {
-              logger.info('Activated Avengers View');
-          });
-      }
-
-      function getAvengers() {
-          return dataservice.getAvengers()
-              .then(function(data) {
-                  vm.avengers = data;
-                  return vm.avengers;
-              });
-      }
-  }
-  ```
-
-### Return a Promise from Data Calls
-###### [Style [Y061](#style-y061)]
-
-  - When calling a data service that returns a promise such as `$http`, return a promise in your calling function too.
-
-    *Why?*: You can chain the promises together and take further action after the data call completes and resolves or rejects the promise.
-
-  ```javascript
-  /* recommended */
-
-  activate();
-
-  function activate() {
-      /**
-       * Step 1
-       * Ask the getAvengers function for the
-       * avenger data and wait for the promise
-       */
-      return getAvengers().then(function() {
-          /**
-           * Step 4
-           * Perform an action on resolve of final promise
-           */
-          logger.info('Activated Avengers View');
-      });
-  }
-
-  function getAvengers() {
-        /**
-         * Step 2
-         * Ask the data service for the data and wait
-         * for the promise
-         */
-        return dataservice.getAvengers()
-            .then(function(data) {
-                /**
-                 * Step 3
-                 * set the data and resolve the promise
-                 */
-                vm.avengers = data;
-                return vm.avengers;
-        });
-  }
   ```
 
     **[Back to top](#table-of-contents)**
 
-## Directives
+## Components / Directives
 ### Limit 1 Per File
 ###### [Style [Y070](#style-y070)]
 
-  - Create one directive per file. Name the file for the directive.
+  - Create one directive per file for easy to maintenance.
 
-    *Why?*: It is easy to mash all the directives in one file, but difficult to then break those out so some are shared across apps, some across modules, some just for one module.
-
-    *Why?*: One directive per file is easy to maintain.
+    Naming convention for component / directive: loader.component.coffee
 
     > Note: "**Best Practice**: Directives should clean up after themselves. You can use `element.on('$destroy', ...)` or `scope.$on('$destroy', ...)` to run a clean-up function when the directive is removed" ... from the Angular documentation
 
-  ```javascript
-  /* avoid */
-  /* directives.js */
-
-  angular
-      .module('app.widgets')
-
-      /* order directive that is specific to the order module */
-      .directive('orderCalendarRange', orderCalendarRange)
-
-      /* sales directive that can be used anywhere across the sales app */
-      .directive('salesCustomerInfo', salesCustomerInfo)
-
-      /* spinner directive that can be used anywhere across apps */
-      .directive('sharedSpinner', sharedSpinner);
-
-  function orderCalendarRange() {
-      /* implementation details */
-  }
-
-  function salesCustomerInfo() {
-      /* implementation details */
-  }
-
-  function sharedSpinner() {
-      /* implementation details */
-  }
-  ```
 
   ```javascript
-  /* recommended */
-  /* calendarRange.directive.js */
+  /* recommended syntax */
+  /* loader.component.js */
 
-  /**
-   * @desc order directive that is specific to the order module at a company named Acme
-   * @example <div acme-order-calendar-range></div>
-   */
-  angular
-      .module('sales.order')
-      .directive('acmeOrderCalendarRange', orderCalendarRange);
+  class LoaderComponenet extends BaseComponent
+    @componentName = 'wmLoader'
+    @directive : ($filter) ->
+        restrict : 'AE',
+        scope : {}
+        controller : () ->
+        link : (scope,element,attrs,controller) ->
+  LoaderComponent.register(angular.module('app.components'))
 
-  function orderCalendarRange() {
-      /* implementation details */
-  }
   ```
 
-  ```javascript
-  /* recommended */
-  /* customerInfo.directive.js */
-
-  /**
-   * @desc spinner directive that can be used anywhere across the sales app at a company named Acme
-   * @example <div acme-sales-customer-info></div>
-   */
-  angular
-      .module('sales.widgets')
-      .directive('acmeSalesCustomerInfo', salesCustomerInfo);
-
-  function salesCustomerInfo() {
-      /* implementation details */
-  }
-  ```
-
-  ```javascript
-  /* recommended */
-  /* spinner.directive.js */
-
-  /**
-   * @desc spinner directive that can be used anywhere across apps at a company named Acme
-   * @example <div acme-shared-spinner></div>
-   */
-  angular
-      .module('shared.widgets')
-      .directive('acmeSharedSpinner', sharedSpinner);
-
-  function sharedSpinner() {
-      /* implementation details */
-  }
-  ```
-
-    Note: There are many naming options for directives, especially since they can be used in narrow or wide scopes. Choose one that makes the directive and its file name distinct and clear. Some examples are below, but see the naming section for more recommendations.
+  - You should always use the wallmob prefix (wm) for wallmob specific components. This helps identify our custom components and avoids any naming collision with 3rd party components.
 
 ### Manipulate DOM in a Directive
 ###### [Style [Y072](#style-y072)]
 
   - When manipulating the DOM directly, use a directive. If alternative ways can be used such as using CSS to set styles or the [animation services](https://docs.angularjs.org/api/ngAnimate), Angular templating, [`ngShow`](https://docs.angularjs.org/api/ng/directive/ngShow) or [`ngHide`](https://docs.angularjs.org/api/ng/directive/ngHide), then use those instead. For example, if the directive simply hides and shows, use ngHide/ngShow.
 
-    *Why?*: DOM manipulation can be difficult to test, debug, and there are often better ways (e.g. CSS, animations, templates)
-
-### Provide a Unique Directive Prefix
-###### [Style [Y073](#style-y073)]
-
-  - Provide a short, unique and descriptive directive prefix such as `acmeSalesCustomerInfo` which would be declared in HTML as `acme-sales-customer-info`.
-
-    *Why?*: The unique short prefix identifies the directive's context and origin. For example a prefix of `cc-` may indicate that the directive is part of a CodeCamper app while `acme-` may indicate a directive for the Acme company.
-
-    Note: Avoid `ng-` as these are reserved for Angular directives. Research widely used directives to avoid naming conflicts, such as `ion-` for the [Ionic Framework](http://ionicframework.com/).
+    DOM manipulation can be difficult to test, debug, and there are often better ways (e.g. CSS, animations, templates)
 
 ### Restrict to Elements and Attributes
 ###### [Style [Y074](#style-y074)]
 
   - When creating a directive that makes sense as a stand-alone element, allow restrict `E` (custom element) and optionally restrict `A` (custom attribute). Generally, if it could be its own control, `E` is appropriate. General guideline is allow `EA` but lean towards implementing as an element when it's stand-alone and as an attribute when it enhances its existing DOM element.
 
-    *Why?*: It makes sense.
-
-    *Why?*: While we can allow the directive to be used as a class, if the directive is truly acting as an element it makes more sense as an element or at least as an attribute.
+    Why? It makes sense.
 
     Note: EA is the default for Angular 1.3 +
 
-  ```html
-  <!-- avoid -->
-  <div class="my-calendar-range"></div>
-  ```
-
-  ```javascript
-  /* avoid */
-  angular
-      .module('app.widgets')
-      .directive('myCalendarRange', myCalendarRange);
-
-  function myCalendarRange() {
-      var directive = {
-          link: link,
-          templateUrl: '/template/is/located/here.html',
-          restrict: 'C'
-      };
-      return directive;
-
-      function link(scope, element, attrs) {
-        /* */
-      }
-  }
-  ```
 
   ```html
-  <!-- recommended -->
-  <my-calendar-range></my-calendar-range>
-  <div my-calendar-range></div>
-  ```
-
-  ```javascript
-  /* recommended */
-  angular
-      .module('app.widgets')
-      .directive('myCalendarRange', myCalendarRange);
-
-  function myCalendarRange() {
-      var directive = {
-          link: link,
-          templateUrl: '/template/is/located/here.html',
-          restrict: 'EA'
-      };
-      return directive;
-
-      function link(scope, element, attrs) {
-        /* */
-      }
-  }
+  <!-- example usage -->
+  <wm-loader></wm-loader>
+  <div wm-loader></div>
   ```
 
 ### Directives and ControllerAs
@@ -1062,7 +389,7 @@ This guide describes best pratices and provides guidance to build our angular ap
 
   - Use `controller as` syntax with a directive to be consistent with using `controller as` with view and controller pairings.
 
-    *Why?*: It makes sense and it's not difficult.
+    Why? It makes sense and it's not difficult.
 
     Note: The directive below demonstrates some of the ways you can use scope inside of link and directive controllers, using controllerAs. I in-lined the template just to keep it all in one place.
 
@@ -1070,59 +397,6 @@ This guide describes best pratices and provides guidance to build our angular ap
 
     Note: Note that the directive's controller is outside the directive's closure. This style eliminates issues where the injection gets created as unreachable code after a `return`.
 
-  ```html
-  <div my-example max="77"></div>
-  ```
-
-  ```javascript
-  angular
-      .module('app')
-      .directive('myExample', myExample);
-
-  function myExample() {
-      var directive = {
-          restrict: 'EA',
-          templateUrl: 'app/feature/example.directive.html',
-          scope: {
-              max: '='
-          },
-          link: linkFunc,
-          controller: ExampleController,
-            controllerAs: 'vm',
-            bindToController: true // because the scope is isolated
-        };
-
-      return directive;
-
-      function linkFunc(scope, el, attr, ctrl) {
-          console.log('LINK: scope.min = %s *** should be undefined', scope.min);
-          console.log('LINK: scope.max = %s *** should be undefined', scope.max);
-          console.log('LINK: scope.vm.min = %s', scope.vm.min);
-          console.log('LINK: scope.vm.max = %s', scope.vm.max);
-      }
-  }
-
-  ExampleController.$inject = ['$scope'];
-
-  function ExampleController($scope) {
-      // Injecting $scope just for comparison
-      var vm = this;
-
-      vm.min = 3;
-
-      console.log('CTRL: $scope.vm.min = %s', $scope.vm.min);
-      console.log('CTRL: $scope.vm.max = %s', $scope.vm.max);
-      console.log('CTRL: vm.min = %s', vm.min);
-      console.log('CTRL: vm.max = %s', vm.max);
-  }
-  ```
-
-  ```html
-  <!-- example.directive.html -->
-  <div>hello world</div>
-  <div>max={{vm.max}}<input ng-model="vm.max"/></div>
-  <div>min={{vm.min}}<input ng-model="vm.min"/></div>
-  ```
 
 ###### [Style [Y076](#style-y076)]
 
@@ -1137,31 +411,23 @@ This guide describes best pratices and provides guidance to build our angular ap
   ```
 
   ```javascript
-  angular
-      .module('app')
-      .directive('myExample', myExample);
 
-  function myExample() {
-      var directive = {
-          restrict: 'EA',
-          templateUrl: 'app/feature/example.directive.html',
-          scope: {
-              max: '='
-          },
-          controller: ExampleController,
-          controllerAs: 'vm',
-          bindToController: true
-      };
-
-      return directive;
-  }
-
-  function ExampleController() {
-      var vm = this;
-      vm.min = 3;
-      console.log('CTRL: vm.min = %s', vm.min);
-      console.log('CTRL: vm.max = %s', vm.max);
-  }
+  class ExampleComponent extends BaseComponent
+    @componentName : 'myExample'
+    @directive : () ->
+      restrict: 'EA',
+      templateUrl: 'example.directive.html',
+      scope: {
+          max: '='
+      },
+      controller: () ->
+        vm = this;
+        vm.min = 3;
+        console.log('CTRL: vm.min = %s', vm.min);
+        console.log('CTRL: vm.max = %s', vm.max);
+      ,
+      controllerAs: 'vm',
+      bindToController: true
   ```
 
   ```html
@@ -1178,76 +444,48 @@ This guide describes best pratices and provides guidance to build our angular ap
 ### Controller Activation Promises
 ###### [Style [Y080](#style-y080)]
 
-  - Resolve start-up logic for a controller in an `activate` function.
+  - Resolve start-up logic for a controller in an `initialize` function.
 
-    *Why?*: Placing start-up logic in a consistent place in the controller makes it easier to locate, more consistent to test, and helps avoid spreading out the activation logic across the controller.
+    Placing start-up logic in a consistent place in the controller makes it easier to locate, more consistent to test, and helps avoid spreading out the activation logic across the controller.
 
-    *Why?*: The controller `activate` makes it convenient to re-use the logic for a refresh for the controller/View, keeps the logic together, gets the user to the View faster, makes animations easy on the `ng-view` or `ui-view`, and feels snappier to the user.
+    The controller `initialize` makes it convenient to re-use the logic for a refresh for the controller/View, keeps the logic together, gets the user to the View faster, makes animations easy on the `ng-view` or `ui-view`, and feels snappier to the user.
 
-    Note: If you need to conditionally cancel the route before you start use the controller, use a [route resolve](#style-y081) instead.
-
-  ```javascript
-  /* avoid */
-  function Avengers(dataservice) {
-      var vm = this;
-      vm.avengers = [];
-      vm.title = 'Avengers';
-
-      dataservice.getAvengers().then(function(data) {
-          vm.avengers = data;
-          return vm.avengers;
-      });
-  }
-  ```
+    In most cases however you want to put the initial controller data in the route resolve instead. This ensures that the data ready before loading the view and you avoid showing a half loaded page.
 
   ```javascript
   /* recommended */
-  function Avengers(dataservice) {
-      var vm = this;
+  class AvengersController extends BaseController
+    @inject('DataService')
+    vm = {}
+
+    initialize : () ->
+      vm = @
       vm.avengers = [];
       vm.title = 'Avengers';
-
-      activate();
-
-      ////////////
-
-      function activate() {
-          return dataservice.getAvengers().then(function(data) {
-              vm.avengers = data;
-              return vm.avengers;
-          });
-      }
-  }
+      vm.DataService.getAvengers().then((data) ->
+          vm.avengers = data
+      )
   ```
+
 
 ### Route Resolve Promises
 ###### [Style [Y081](#style-y081)]
 
-  - When a controller depends on a promise to be resolved before the controller is activated, resolve those dependencies in the `$routeProvider` before the controller logic is executed. If you need to conditionally cancel a route before the controller is activated, use a route resolver.
-
-  - Use a route resolve when you want to decide to cancel the route before ever transitioning to the View.
-
-    *Why?*: A controller may require data before it loads. That data may come from a promise via a custom factory or [$http](https://docs.angularjs.org/api/ng/service/$http). Using a [route resolve](https://docs.angularjs.org/api/ngRoute/provider/$routeProvider) allows the promise to resolve before the controller logic executes, so it might take action based on that data from the promise.
-
-    *Why?*: The code executes after the route and in the controller’s activate function. The View starts to load right away. Data binding kicks in when the activate promise resolves. A “busy” animation can be shown during the view transition (via `ng-view` or `ui-view`)
-
-    Note: The code executes before the route via a promise. Rejecting the promise cancels the route. Resolve makes the new view wait for the route to resolve. A “busy” animation can be shown before the resolve and through the view transition. If you want to get to the View faster and do not require a checkpoint to decide if you can get to the View, consider the [controller `activate` technique](#style-y080) instead.
+  - Use route resolve promises when ever you controller / view needs an initial dataset
 
   ```javascript
-  /* avoid */
-  angular
-      .module('app')
-      .controller('Avengers', Avengers);
+  /* recommended */
+    $stateProvider.state('categories', {
+        url: '/categories',
+        title: 'Categories',
+        templateUrl: 'app/src/modules/inventory/category-list.html',
+        controller : 'CategoryListController as vm',
+        resolve: {
+            categoryList : (CategoryService) ->
+                CategoryService.list()
+        }
+    })
 
-  function Avengers(movieService) {
-      var vm = this;
-      // unresolved
-      vm.movies;
-      // resolved asynchronously
-      movieService.getMovies().then(function(response) {
-          vm.movies = response.movies;
-      });
-  }
   ```
 
   ```javascript
