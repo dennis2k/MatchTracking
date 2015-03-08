@@ -1,11 +1,13 @@
 var gulp = require('gulp')
     coffee = require('gulp-coffee'),
     gutil = require('gulp-util'),
+    sass = require('gulp-sass'),
     concat = require('gulp-concat');
 src = {
     'coffee': {
         'all': ['controllers/*.coffee','services/*.coffee','models/*.coffee','directives/*.coffee','filters/*.coffee','app.coffee']
-    }
+    },
+    'sass' : 'sass/*.sass'
 }
 
 dist = {
@@ -39,9 +41,16 @@ gulp.task('build', function () {
         .pipe(gulp.dest(dist.javascript));
 });
 
+gulp.task('sass', function () {
+    gulp.src(src.sass)
+        .pipe(sass())
+        .pipe(gulp.dest(dist.css));
+});
+
 gulp.task('watcher', function () {
     gulp.watch(src.coffee.all, ['build']);
+    gulp.watch(src.sass, ['sass']);
 })
-gulp.task('watch', ['build','watcher']);
+gulp.task('watch', ['build','sass', 'watcher']);
 
-gulp.task('default', ['build']);
+gulp.task('default', ['build','sass']);
