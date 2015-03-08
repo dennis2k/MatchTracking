@@ -1,7 +1,6 @@
-app/.sass-cache
 app/dist
 app/bower_components
-aa/node_modules
+app/node_modules
 .idea
 
 
