@@ -13,5 +13,11 @@
     "grunt-contrib-coffee": "^0.12.0",
     "grunt-contrib-compass": "^1.0.1",
     "grunt-newer": "^0.7.0"
+  },
+  "dependencies": {
+    "gulp": "^3.8.11",
+    "gulp-coffee": "^2.3.1",
+    "gulp-concat": "^2.5.2",
+    "gulp-util": "^3.0.4"
   }
 }
