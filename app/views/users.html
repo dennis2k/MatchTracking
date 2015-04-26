@@ -1,39 +1,55 @@
-<h1>Users</h1>
+<div class="content-box">
+    <div class="event-container">
+        <h1>Users</h1>
 
+        <div class="row">
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <form class="form-horizontal">
+                    <fieldset>
 
-<form class="form-horizontal">
-    <fieldset>
+                        <!-- Form Name -->
+                        <legend>Create User</legend>
 
-        <!-- Form Name -->
-        <legend>Create User</legend>
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="username">Username</label>
+                            <div class="col-md-4">
+                                <input ng-model="vm.newUser._id" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
+                            </div>
+                        </div>
 
-        <!-- Text input-->
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="email">Email</label>
-            <div class="col-md-4">
-                <input ng-model="vm.newUser.email" id="email" name="email" type="text" placeholder="email" class="form-control input-md" required="">
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="password">Password</label>
+                            <div class="col-md-4">
+                                <input ng-model="vm.newUser.password" id="password" name="password" type="password" class="form-control input-md" required="">
+                            </div>
+                        </div>
 
+                        <!-- Button -->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="submit"></label>
+                            <div class="col-md-4">
+                                <button id="submit" class="btn btn-primary" ng-click="vm.save(vm.newUser)">Save</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <h3>All users</h3>
+                <table class="table">
+                    <tr>
+                        <th>Name</th>
+                        <th></th>
+                    </tr>
+                    <tr ng-repeat="user in vm.users">
+                        <td ng-click="vm.newUser = user">{{ user._id }}</td>
+                        <td><a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.remove(user)"></span> </a></td>
+                    </tr>
+                </table>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Text input-->
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="username">Username</label>
-            <div class="col-md-4">
-                <input ng-model="vm.newUser.username" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
-            </div>
-        </div>
-
-        <!-- Button -->
-        <div class="form-group">
-            <label class="col-md-4 control-label" for="submit"></label>
-            <div class="col-md-4">
-                <button id="submit" class="btn btn-primary" ng-click="vm.saveNewUser(vm.newUser)">Save</button>
-            </div>
-        </div>
-    </fieldset>
-</form>
-
-<p ng-repeat="user in vm.users" ng-click="vm.deleteUser(user)">
-    {{ user.username }}
-</p>

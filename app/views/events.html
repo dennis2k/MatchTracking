@@ -61,72 +61,55 @@
                 <div class="box-padding-md" style="width: 400px">
                     <form class="form-horizontal">
                         <fieldset>
-                            <div class="input-group">
-                                <input ng-model="vm.player" id="username" name="username" type="text" placeholder="Playername" class="form-control" required="">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="button" ng-click="vm.addPlayer(vm.player)" ui-keypress="{13:'vm.addPlayer(vm.player)'}">Add</button>
-                                </span>
-                            </div><!-- /input-group -->
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="duration">Player</label>
+                                <div class="col-md-6">
+                                    <select ng-model="vm.player._id" id="player" name="player" class="form-control inline-medium" ng-options="player._id as player._id for player in vm.availableUsers() | orderBy:'_id'"></select>
+                                    <button class="btn btn-primary" type="button" ng-click="vm.addPlayer(vm.player)" ui-keypress="{13:'vm.addPlayer(vm.player)'}" ng-disabled="!vm.player">Add</button>
+                                </div>
+                            </div>
                         </fieldset>
                     </form>
                 </div>
             </tab>
             <tab heading="Add match">
-                <div class="box-padding-md">
-                    <form class="form-horizontal">
-                        <fieldset>
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-4 control-label" for="game">Game</label>
-                                <div class="col-md-4">
-                                    <input ng-model="vm.match.game" id="game" name="game" type="text" placeholder="" typeahead="game._id for game in vm.getGames($viewValue)" class="form-control input-md">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form class="form-horizontal">
+                            <fieldset>
+                                    <label class="control-label" for="game">Game</label>
+                                    <div>
+                                        <input ng-model="vm.match.game" id="game" name="game" type="text" placeholder="" typeahead="game._id for game in vm.getGames($viewValue)" class="form-control input-md">
+                                    </div>
+                                    <label class="control-label" for="report">Match report</label>
+                                    <div>
+                                        <textarea ng-model="vm.match.report" class="form-control" id="report" name="report"></textarea>
+                                    </div>
 
-                                </div>
-                            </div>
-
-                            <!-- Textarea -->
-                            <div class="form-group">
-                                <label class="col-md-4 control-label" for="report">Match report</label>
-                                <div class="col-md-4">
-                                    <textarea ng-model="vm.match.report" class="form-control" id="report" name="report"></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-4 control-label" for="duration">Duration</label>
-                                <div class="col-md-4">
-                                    <input ng-model="vm.match.duration" id="duration" name="duration" type="text" placeholder="" class="form-control input-md">
-                                    <span class="help-block">Duration of the game in minutes</span>
-                                </div>
-                            </div>
-
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-4 control-label" for="duration">Players</label>
-                                <div class="col-md-6">
-                                    <select ng-model="vm.currentPlayer.name" id="currentPlayer" name="currentPlayer" class="form-control inline-medium" ng-options="player.name as player.name for player in vm.currentEvent.players | orderBy:'name'"></select>
-                                    <select ng-model="vm.currentPlayer.rank" class="form-control inline-small" ng-options="n for n in [] | range:10" ></select>
-                                    <button class="btn btn-primary btn-sm" ng-click="vm.addPlayerToMatch(vm.currentPlayer)">Add</button>
-                                </div>
-                            </div>
-                            <table class="table">
-                                <tr ng-repeat="player in vm.match.players | orderBy:'rank'">
-                                    <td>{{ player.rank }}</td>
-                                    <td>{{ player.name }}</td>
-                                    <td><a class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-remove" ng-click="vm.removePlayerFromMatch(player)"></span> </a></td>
-                                </tr>
-                            </table>
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-4 control-label"></label>
-                                <div class="col-md-4">
-                                    <button class="btn btn-primary" ng-click="vm.addMatch(vm.match)">Add match</button>
-                                </div>
-                            </div>
-
-                        </fieldset>
-                    </form>
+                                    <label class="control-label" for="duration">Duration</label>
+                                    <div>
+                                        <input ng-model="vm.match.duration" id="duration" name="duration" type="text" placeholder="" class="form-control input-md">
+                                        <span class="help-block">Duration of the game in minutes</span>
+                                    </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="col-lg-12">
+                        <table class="table">
+                            <tr>
+                                <th>Player</th>
+                                <th>Rank</th>
+                                <th>Exclude</th>
+                            </tr>
+                            <tr ng-repeat="player in vm.match.players | orderBy : 'rank'">
+                                <td>{{ player.name }}</td>
+                                <td><select ng-model="player.rank" ng-init="player.rank = $index+1" class="form-control inline-small" ng-options="n for n in [] | range:vm.currentEvent.players.length" ng-disabled="player.is_not_participating" ></select></td>
+                                <td><input type="checkbox" ng-model="player.is_not_participating" ng-checked="player.is_not_participating" ng-click="player.is_not_participating ? player.rank = '' : player.rank = $index+1"></td>
+                            </tr>
+                        </table>
+                        <button class="btn btn-primary" ng-click="vm.addMatch(vm.match)">Add match</button>
+                    </div>
                 </div>
             </tab>
             <tab heading="Matches">

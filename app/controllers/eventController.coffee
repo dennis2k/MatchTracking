@@ -1,7 +1,8 @@
-@EventController = ($rootScope, $filter, EventService, GamesService, AlertService, eventList, gamesList) ->
+@EventController = ($rootScope, $filter, toaster, EventService, GamesService, AlertService, eventList, gamesList, userList) ->
   vm = this
   vm.events = eventList.data
   vm.games = gamesList.data
+  vm.users = userList.data
   vm.currentEvent = {}
   vm.match = {}
   vm.root = $rootScope;
@@ -12,13 +13,14 @@
       _id : event._id.$id
     EventService.query(params).then((result) ->
       vm.currentEvent = result.data.pop()
+      vm.match.players = vm.currentEvent.players
     )
 
   # Add a player to the event
   addPlayer = (player) ->
     return null if !player?
     vm.currentEvent.players.push(player)
-    EventService.addPlayer(vm.currentEvent._id.$id,player).then((result) ->
+    EventService.addPlayer(vm.currentEvent._id.$id,player._id).then((result) ->
       vm.currentEvent = result.data if result.status
       vm.player = null;
     );
@@ -44,9 +46,17 @@
 
   # Adds a match to the event
   addMatch = (match) ->
-    if angular.isUndefined(vm.match.players) || vm.match.players.length < 2
-      return AlertService.warning("At least two players need to participate in a match")
+    filteredPlayers = $filter('filter')(match.players,(player) ->
+      if player.rank == ''
+        return false
+      if player.is_not_participating
+        return false
+      return true
+    )
+    if(filteredPlayers.length == 0)
+      toaster.pop('warning',"Warning!","No players selected for match")
 
+    match.players = filteredPlayers
     m = new EloCalculator(match.players)
     m.calculateNewRating();
     EventService.addMatch(vm.currentEvent._id.$id,match).then((result) ->
@@ -55,10 +65,11 @@
         eventPlayer = filteredArray.pop()
         eventPlayer.rating = player.new_rating
         delete eventPlayer.rank
+        delete eventPlayer.is_not_participating
       EventService.updatePlayerRating(vm.currentEvent._id.$id,vm.currentEvent.players)
-      vm.currentEvent.matches.push(match);
-      vm.match = {};
-
+      vm.currentEvent.matches = result.data.matches
+      vm.match = {players : vm.currentEvent.players};
+      toaster.pop('info',"Info","Match was added !")
     )
   # Removes a match from an event
   removeMatch = (match) ->
@@ -85,9 +96,11 @@
 
   #get the image of a game
   getGameImage = (game) ->
+
     filteredArray = $filter('filter')(vm.games,{_id : game})
     game = filteredArray.pop()
-    game.image_url|| "";
+    return "" if(angular.isUndefined(game))
+    game.image_url || "";
 
   #Calculate the number of matches for a player
   numMatches = (player) ->
@@ -99,7 +112,22 @@
     )
     count
 
+  ###
+    Get a filtered list of users that are not already in the current event
+  ###
+  availableUsers = () ->
+    usersToSelect = $filter('filter')(vm.users,(user) ->
+      found = false
+      angular.forEach(vm.currentEvent.players,(eventPlayer) ->
+        if(eventPlayer.name == user._id)
+          found = true
+      )
+      !found
+    )
+    usersToSelect
+
   # API
+  vm.availableUsers = availableUsers
   vm.addPlayerToMatch = addPlayerToMatch
   vm.removePlayerFromMatch = removePlayerFromMatch
   vm.loadEvent = loadEvent
@@ -118,3 +146,5 @@ EventController.resolve =
     EventService.query()
   gamesList : (GamesService) ->
     GamesService.query()
+  userList : (UserService) ->
+    UserService.query()

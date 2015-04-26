@@ -9,6 +9,7 @@
 include_once __DIR__ ."/vendor/autoload.php";
 include_once __DIR__ . "/core/JSON.class.php";
 include_once __DIR__ . "/core/Param.class.php";
+include_once __DIR__ . "/core/Utility.class.php";
 
 $app = new \Slim\Slim();
 header('Content-Type: application/json');

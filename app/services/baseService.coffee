@@ -26,6 +26,8 @@
                 deferred.reject(response)
       deferred.promise;
 
+    getById : (id) ->
+      @query({ doc : { _id : id, } })
     query : (params) ->
       request('get', @route+ "/query",params)
     insert : (params) ->
