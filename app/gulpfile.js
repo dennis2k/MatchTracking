@@ -5,15 +5,19 @@ var gulp = require('gulp')
     concat = require('gulp-concat');
 
 src = {
-    'coffee': {
-        'all': ['controllers/*.coffee','services/*.coffee','models/*.coffee','directives/*.coffee','filters/*.coffee','app.coffee']
+    coffee: {
+        modules : 'src/modules/**/*.coffee',
+        core : 'src/core/*.coffee',
+        directives : 'src/directives/*.coffee',
+        app : 'src/app.coffee'
+//        'all': ['controllers/*.coffee','services/*.coffee','models/*.coffee','directives/*.coffee','filters/*.coffee','app.coffee']
     },
     'sass' : 'sass/style.sass'
 }
 
 dist = {
-    'css': 'css/',
-    'javascript': 'dist/'
+    'css': 'asserts/css/',
+    'javascript': 'asserts/dist/'
 }
 
 // clean stream of onerror
@@ -34,7 +38,7 @@ var continueOnError = function(stream) {
 };
 
 gulp.task('build', function () {
-    return gulp.src(src.coffee.all)
+    return gulp.src([src.coffee.core,src.coffee.directives,src.coffee.modules,src.coffee.app])
         .pipe(continueOnError(coffee({bare:true})).on('error', gutil.log))
         .pipe(concat('matchtracker.js'))
         .pipe(gulp.dest(dist.javascript));
@@ -47,7 +51,7 @@ gulp.task('sass', function () {
 });
 
 gulp.task('watcher', function () {
-    gulp.watch(src.coffee.all, ['build']);
+    gulp.watch([src.coffee.core,src.coffee.directives,src.coffee.modules,src.coffee.app], ['build']);
     gulp.watch(src.sass, ['sass']);
 })
 gulp.task('watch', ['build','sass', 'watcher']);

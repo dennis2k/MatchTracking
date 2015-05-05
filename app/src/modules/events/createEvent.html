@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+        <h3>Details</h3>
+        <form class="form-horizontal">
+            <label for="event_name">Event name</label>
+            <input ng-model="vm.event.name" id="event_name" name="event_name" type="text" placeholder="" class="form-control input-md" required="">
+
+            <label for="place">Place</label>
+            <input ng-model="vm.event.place" id="place" name="place" type="text" placeholder="" class="form-control input-md">
+
+            <label for="place">Image</label>
+            <input id="image" name="image" type="file" placeholder="" class="form-control input-md">
+
+            <label for="start">Begin date</label>
+            <input ng-model="vm.event.start" id="start" name="start" type="text" placeholder="dd-mm-yyyy" class="form-control input-md">
+            <span class="help-block">First day of the event</span>
+
+            <label for="end">End date</label>
+            <input ng-model="vm.event.end" id="end" name="end" type="text" placeholder="dd-mm-yyyy" class="form-control input-md">
+            <span class="help-block">Last day of the event</span>
+        </form>
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+        <h3>Participants</h3>
+        <form class="form-horizontal">
+
+            <table class="table">
+                <tr>
+                    <th>User</th>
+                    <th>Add to event</th>
+                </tr>
+                <tr ng-repeat="user in vm.users | orderBy : '_id'">
+                    <td>{{ user._id }}</td>
+                    <td><input type="checkbox" ng-model="user.include" ng-checked="user.include"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div class="col-lg-12">
+        <button class="btn btn-primary pull-right" ng-click="vm.saveEvent(vm.event)">Save</button>
+    </div>
+</div>

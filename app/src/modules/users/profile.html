@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" >
+        <img class="img-circle" src="asserts/img/decent.jpg">
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" >
+        <table class="table">
+            <tr>
+                <td>Username</td>
+                <td>{{ vm.user._id }}</td>
+            </tr>
+            <tr>
+                <td>Last login</td>
+                <td>{{ (vm.user.last_login*1000) | date : 'MMM d, y' }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-lg-12">
+        <h1>Something lol in here</h1>
+    </div>
+
+</div>

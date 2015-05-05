@@ -1,0 +1,48 @@
+<div class="content-box">
+    <div class="event-container">
+        <h1>Users</h1>
+        <div class="row">
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <h3>New user</h3>
+                <form class="form-horizontal">
+                    <fieldset>
+
+                            <label class="control-label" for="username">Username</label>
+
+                                <input ng-model="vm.newUser._id" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
+
+
+                            <label class="control-label" for="password">Password</label>
+
+                                <input ng-model="vm.newUser.password" id="password" name="password" type="password" class="form-control input-md" required="">
+
+                            <label class="control-label" for="password">Admin</label>
+
+                            <input ng-model="vm.newUser.admin" id="admin" name="admin" type="checkbox" class="" ng-true-value="true" ng-false-value="false">
+
+                            <br />
+                            <br />
+                            <button id="submit" class="btn btn-primary" ng-click="vm.save(vm.newUser)">Save</button>
+
+                    </fieldset>
+                </form>
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                <h3>All users</h3>
+                <table class="table">
+                    <tr>
+                        <th>Name</th>
+                        <th>Admin</th>
+                        <th></th>
+                    </tr>
+                    <tr ng-repeat="user in vm.users">
+                        <td ng-click="vm.newUser = user">{{ user._id }}</td>
+                        <td>{{ user.admin }}</td>
+                        <td><a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.remove(user)"></span> </a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

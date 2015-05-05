@@ -1,4 +1,5 @@
-app/dist
+app/asserts/dist
+app/asserts/img
 app/bower_components
 app/node_modules
 .idea

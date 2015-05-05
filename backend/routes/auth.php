@@ -21,10 +21,7 @@ $app->post("/auth/login",function() use ($app,$usersCollection) {
     $doc['token'] = uniqid('', true);
     $doc['last_login'] = time();
     $usersCollection->update(array('_id' => $username),$doc);
-    $result = array('token' => $doc['token']);
-    if(isset($doc['admin']) && $doc['admin'] == true)
-        $result['admin'] = true;
-    JSON::success($result);
+    JSON::success($doc);
 });
 
 
@@ -39,7 +36,7 @@ $app->get("/auth",function() use ($app,$usersCollection) {
         return JSON::error('no user');
 
     $query = array('token' => $token, '_id' => $username);
-    $query['_id'] = new MongoRegex("/^" . $username . "/i");
+//    $query['_id'] = new MongoRegex("/^" . $username . "/i");
     $doc = $usersCollection->findOne($query);
 
     if(!empty($doc))

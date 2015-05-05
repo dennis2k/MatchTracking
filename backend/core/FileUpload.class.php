@@ -1,7 +1,11 @@
 <?php
 class FileUpload   {
 
-    private $name, $type, $tmp_name, $error, $size, $path;
+    private $name, $type, $tmp_name, $error, $size, $path, $context;
+
+    public function __construct($context){
+        $this->context = $context;
+    }
 
     /**
      * Load the file into the object
@@ -35,7 +39,7 @@ class FileUpload   {
 
     public function getPath()
     {
-        return "img/$this->name";
+        return "asserts/img/{$this->context}/{$this->name}";
     }
 
     /**

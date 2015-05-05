@@ -1,0 +1,64 @@
+<div class="content-box" ng-if="authenticated == false">
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <div class="event-container">
+                <tabset>
+                    <tab heading="Login">
+                        <form class="form-horizontal box-padding-md">
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="username">Username</label>
+                                <div class="col-md-4">
+                                    <input ng-model="vm.creds._id" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
+                                </div>
+                            </div>
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="password">Password</label>
+                                <div class="col-md-4">
+                                    <input ng-model="vm.creds.password" id="password" name="password" type="password" class="form-control input-md" required="">
+                                </div>
+                            </div>
+
+                            <!-- Button -->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="submit"></label>
+                                <div class="col-md-4">
+                                    <button id="submit" class="btn btn-primary" ng-click="vm.authenticate(vm.creds)">Mæææh</button>
+                                </div>
+                            </div>
+                        </form>
+                    </tab>
+                    <tab heading="Register">
+                        <form class="form-horizontal box-padding-md">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="username">Username</label>
+                                <div class="col-md-4">
+                                    <input ng-model="vm.newUser._id" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
+                                </div>
+                            </div>
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="password">Password</label>
+                                <div class="col-md-4">
+                                    <input ng-model="vm.newUser.password" id="password" name="password" type="password" class="form-control input-md" required="">
+                                </div>
+                            </div>
+
+                            <!-- Button -->
+                            <div class="form-group">
+                                <label class="col-md-4 control-label" for="submit"></label>
+                                <div class="col-md-4">
+                                    <button id="submit" class="btn btn-primary" ng-click="vm.register(vm.newUser)">Register</button>
+                                </div>
+                            </div>
+                        </form>
+                    </tab>
+                </tabset>
+            </div>
+
+        </div>
+    </div>
+</div>

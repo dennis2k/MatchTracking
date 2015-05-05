@@ -10,6 +10,7 @@ include_once __DIR__ ."/vendor/autoload.php";
 include_once __DIR__ . "/core/JSON.class.php";
 include_once __DIR__ . "/core/Param.class.php";
 include_once __DIR__ . "/core/Utility.class.php";
+include_once __DIR__ . "/services/BaseCollectionService.php";
 
 $app = new \Slim\Slim();
 header('Content-Type: application/json');
@@ -18,8 +19,17 @@ header('Content-Type: application/json');
 $m = new MongoClient();
 $db = $m->matchtracker;
 
-foreach (glob("../backend/routes/*.php") as $filename)
-    include $filename;
+try {
+    foreach (glob("../backend/routes/*.php") as $filename)
+        include $filename;
+}
+catch(Exception $e)
+{
+    $app->response()->status(400);
+    $app->response()->header('X-Status-Reason', $e->getMessage());
+    JSON::error($e->getMessage());
+}
+
 
 
 
