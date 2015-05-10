@@ -36,7 +36,7 @@ this.ApplicationController = function($rootScope, AuthService, $location, localS
   return vm;
 };
 
-this.BaseServiceWrapper = function($http, $q, $upload, toaster) {
+this.BaseServiceWrapper = function($http, $q, toaster) {
   return this.BaseService = (function() {
     var request;
 
@@ -91,7 +91,7 @@ this.BaseServiceWrapper = function($http, $q, $upload, toaster) {
 
     BaseService.prototype["delete"] = function(id) {
       return request('post', this.route + "/remove", {
-        id: id
+        _id: id
       });
     };
 
@@ -158,24 +158,6 @@ this.Utility = function(Upload) {
     });
   };
   return service;
-};
-
-this.Enlarge = function() {
-  var directive;
-  directive = {};
-  directive.restrict = 'A';
-  directive.link = function(scope, element, attrs) {
-    var originalHeight, originalWidth;
-    originalHeight = element.css('height');
-    originalWidth = element.css('width');
-    element.on('mouseenter', function() {
-      return element.css('width', '100px').css('height', '100px');
-    });
-    return element.on('mouseleave', function() {
-      return element.css('width', originalWidth).css('height', originalHeight);
-    });
-  };
-  return directive;
 };
 
 this.HistoryBack = function($window) {
@@ -270,11 +252,12 @@ this.AuthServiceWrapper = function(localStorageService, $http, $q, $rootScope, $
   return new AuthService;
 };
 
-this.CreateEventController = function($location, $filter, EventService, userList, $rootScope) {
-  var vm;
+this.CreateEventController = function($location, $filter, $scope, EventService, userList, $rootScope, Utility) {
+  var convertDateToTime, vm;
   vm = this;
   vm.users = userList.data;
   vm.event = {};
+  vm.files = [];
   vm.saveEvent = function(event) {
     var eventPlayers, i, len, player, ref;
     eventPlayers = [];
@@ -290,11 +273,37 @@ this.CreateEventController = function($location, $filter, EventService, userList
     }
     event.players = eventPlayers;
     event.owner = $rootScope.user._id;
+    event.start = convertDateToTime(event.start);
+    event.end = convertDateToTime(event.end);
     return EventService.insert({
       event: event
     }).then(function(result) {
       return $location.path('/events');
     });
+  };
+  $scope.$watch('vm.files', function(n, o) {
+    if (n !== o && n !== null && angular.isDefined(n)) {
+      return vm.upload(vm.files);
+    }
+  });
+  vm.upload = function(files) {
+    if (files && files.length) {
+      return angular.forEach(files, function(file) {
+        return Utility.upload(file, 'game').then(function(response) {
+          return vm.event.image_url = response.data.data;
+        });
+      });
+    }
+  };
+  convertDateToTime = function(date) {
+    var d;
+    d = new Date(date);
+    return d.getTime();
+  };
+  vm.openDatePicker = function($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+    return vm.opened = true;
   };
   return vm;
 };
@@ -366,26 +375,20 @@ this.EloCalculator = (function() {
 
 })();
 
-this.EventController = function($rootScope, $filter, $scope, toaster, EventService, GamesService, eventList, gamesList, userList, Utility) {
-  var addMatch, addPlayer, addPlayerToMatch, availableUsers, canEdit, getGameImage, getGames, loadEvent, numMatches, removeMatch, removePlayer, removePlayerFromMatch, revertMatch, vm;
+this.EventController = function(event, $rootScope, $filter, $scope, $location, toaster, EventService, GamesService, eventList, gamesList, userList, Utility) {
+  var vm;
   vm = this;
-  vm.events = eventList.data;
   vm.games = gamesList.data;
   vm.users = userList.data;
-  vm.currentEvent = {};
-  vm.match = {};
-  vm.root = $rootScope;
-  loadEvent = function(event) {
-    var params;
-    params = {
-      _id: event._id.$id
-    };
-    return EventService.query(params).then(function(result) {
-      vm.currentEvent = result.data.pop();
-      return vm.match.players = vm.currentEvent.players;
-    });
+  vm.currentEvent = event.data[0];
+  vm.match = {
+    players: vm.currentEvent.players
   };
-  addPlayer = function(player) {
+  vm.root = $rootScope;
+  vm.selectEvent = function(event) {
+    return $location.path('/event/' + event.name);
+  };
+  vm.addPlayer = function(player) {
     if (player == null) {
       return null;
     }
@@ -397,14 +400,14 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
       return vm.player = null;
     });
   };
-  removePlayer = function(player) {
+  vm.removePlayer = function(player) {
     return EventService.removePlayer(vm.currentEvent._id.$id, player).then(function(result) {
       if (result.status) {
         return vm.currentEvent = result.data;
       }
     });
   };
-  addPlayerToMatch = function(player) {
+  vm.addPlayerToMatch = function(player) {
     var filteredArray, matchPlayer;
     if (vm.match.players == null) {
       vm.match.players = [];
@@ -416,12 +419,12 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
     matchPlayer.rank = player.rank;
     return vm.match.players.push(angular.copy(matchPlayer));
   };
-  removePlayerFromMatch = function(player) {
+  vm.removePlayerFromMatch = function(player) {
     var idx;
     idx = vm.match.players.indexOf(player);
     return vm.match.players.splice(idx, 1);
   };
-  addMatch = function(match) {
+  vm.addMatch = function(match) {
     var filteredPlayers, m;
     filteredPlayers = $filter('filter')(match.players, function(player) {
       if (player.rank === '') {
@@ -459,14 +462,14 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
       return toaster.pop('info', "Info", "Match was added !");
     });
   };
-  removeMatch = function(match) {
+  vm.removeMatch = function(match) {
     return EventService.removeMatch(vm.currentEvent._id.$id, match.uid).then(function(result) {
       if (result.status) {
         return vm.currentEvent = result.data;
       }
     });
   };
-  revertMatch = function(match) {
+  vm.revertMatch = function(match) {
     angular.forEach(match.players, function(player) {
       var eventPlayer;
       eventPlayer = $filter('filter')(vm.currentEvent.players, {
@@ -481,12 +484,12 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
       return removeMatch(match);
     });
   };
-  getGames = function(input) {
+  vm.getGames = function(input) {
     return GamesService.findGamesByName(input).then(function(result) {
       return result.data;
     });
   };
-  getGameImage = function(game) {
+  vm.getGameImage = function(game) {
     var filteredArray;
     filteredArray = $filter('filter')(vm.games, {
       _id: game
@@ -497,7 +500,7 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
     }
     return game.image_url || "";
   };
-  numMatches = function(player) {
+  vm.numMatches = function(player) {
     var count;
     count = 0;
     angular.forEach(vm.currentEvent.matches, function(match, mindex) {
@@ -513,7 +516,7 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
   /*
     Get a filtered list of users that are not already in the current event
    */
-  availableUsers = function() {
+  vm.availableUsers = function() {
     var usersToSelect;
     usersToSelect = $filter('filter')(vm.users, function(user) {
       var found;
@@ -527,8 +530,13 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
     });
     return usersToSelect;
   };
-  canEdit = function() {
+  vm.canEdit = function() {
     return $rootScope.user.admin || $rootScope.user._id === vm.currentEvent.owner;
+  };
+  vm["delete"] = function(event) {
+    return EventService["delete"](event._id.$id).then(function(response) {
+      return $location.path('/events');
+    });
   };
   $scope.$watch('vm.match.files', function() {
     return vm.upload(vm.match.files);
@@ -543,19 +551,6 @@ this.EventController = function($rootScope, $filter, $scope, toaster, EventServi
       });
     }
   };
-  vm.availableUsers = availableUsers;
-  vm.addPlayerToMatch = addPlayerToMatch;
-  vm.removePlayerFromMatch = removePlayerFromMatch;
-  vm.loadEvent = loadEvent;
-  vm.addPlayer = addPlayer;
-  vm.removePlayer = removePlayer;
-  vm.addMatch = addMatch;
-  vm.removeMatch = removeMatch;
-  vm.revertMatch = revertMatch;
-  vm.getGames = getGames;
-  vm.getGameImage = getGameImage;
-  vm.numMatches = numMatches;
-  vm.canEdit = canEdit;
   return vm;
 };
 
@@ -574,6 +569,35 @@ EventController.resolve = {
   },
   userList: function(UserService) {
     return UserService.query();
+  },
+  event: function($location, EventService) {
+    var parts;
+    parts = $location.$$url.split('/');
+    return EventService.query({
+      _id: parts[2]
+    });
+  }
+};
+
+this.EventListController = function($location, EventService, eventList) {
+  var vm;
+  vm = this;
+  vm.events = eventList.data;
+  vm.selectEvent = function(event) {
+    return $location.path('/event/' + event._id.$id);
+  };
+  return vm;
+};
+
+EventListController.resolve = {
+  eventList: function(EventService, $rootScope) {
+    if (angular.isDefined($rootScope.user)) {
+      return EventService.query({
+        query: {
+          "players.name": $rootScope.user._id
+        }
+      });
+    }
   }
 };
 
@@ -737,23 +761,63 @@ GameGameController.resolve = {
   }
 };
 
-this.GamesController = function($filter, GamesService, gameList) {
-  var removeGame, saveGame, uploadFile, vm;
+this.GamesController = function($filter, $scope, GamesService, gameList, Utility) {
+  var add, edit, removeGame, saveGame, vm;
   vm = this;
   vm.games = gameList.data;
   vm.newGame = {};
+  vm.mode = 'list';
+  vm.durationOptions = [
+    {
+      key: 0,
+      text: 'Freenzy (5 - 15 min)'
+    }, {
+      key: 1,
+      text: 'Lets get it awn! (15 - 60 min)'
+    }, {
+      key: 2,
+      text: 'Cum awn!(1 - 2 hours)'
+    }, {
+      key: 3,
+      text: 'Jesus! (2 - 4 hours)'
+    }, {
+      key: 4,
+      text: 'Sn00zey (4 hours+)'
+    }
+  ];
+  vm.skillFactorOptions = [
+    {
+      key: 0,
+      text: 'So much Random'
+    }, {
+      key: 1,
+      text: 'Random'
+    }, {
+      key: 2,
+      text: 'Skill game with a twist of ransom !'
+    }, {
+      key: 3,
+      text: 'Pure skillaz'
+    }
+  ];
   saveGame = function(game) {
     if (angular.isUndefined(game._id)) {
       return GamesService.insert(game).then(function(result) {
         if (result.status) {
-          vm.games.push(result.data);
+          return vm.games.push(result.data);
         }
-        return console.log("hello");
       });
     } else {
       return GamesService.update({
         _id: game._id,
         doc: game
+      }).then(function(response) {
+        if (vm.mode === 'add') {
+          if (response.status) {
+            vm.games.push(response.data);
+          }
+          return vm.mode = 'list';
+        }
       });
     }
   };
@@ -764,10 +828,46 @@ this.GamesController = function($filter, GamesService, gameList) {
       return vm.games.splice(idx, 1);
     });
   };
-  uploadFile = function(files) {};
+  edit = function(game) {
+    vm.mode = 'edit';
+    return vm.newGame = game;
+  };
+  add = function() {
+    vm.mode = 'add';
+    return vm.newGmae = {};
+  };
+  $scope.$watch('vm.files', function(n, o) {
+    if (n !== o && n !== null && angular.isDefined(n)) {
+      return vm.upload(vm.files);
+    }
+  });
+  vm.upload = function(files) {
+    if (angular.isUndefined(vm.newGame.images)) {
+      vm.newGame.images = [];
+    }
+    if (files && files.length) {
+      return angular.forEach(files, function(file) {
+        return Utility.upload(file, 'game').then(function(response) {
+          return vm.newGame.images.push(response.data.data);
+        });
+      });
+    }
+  };
+  vm.findGameByQuery = function(query) {
+    var q;
+    q = {};
+    if (query.length > 0) {
+      q = {
+        _id: query
+      };
+    }
+    return GamesService.query(q).then(function(response) {
+      return vm.games = response.data;
+    });
+  };
   vm.saveGame = saveGame;
   vm.removeGame = removeGame;
-  vm.uploadFile = uploadFile;
+  vm.edit = edit;
   return vm;
 };
 
@@ -956,7 +1056,7 @@ this.WishServiceWrapper = function(BaseService) {
   return new WishService('wishe');
 };
 
-this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate', 'ui.bootstrap', 'toaster', 'LocalStorageModule', 'ngFileUpload']).directive('enlarge', Enlarge).filter('range', RangeFilter).filter('games', GamesFilter).factory('Utility', Utility).factory('AuthService', AuthServiceWrapper).factory('EventService', EventServiceWrapper).factory('GamesService', GamesServiceWrapper).factory('WishService', WishServiceWrapper).factory('UserService', UserServiceWrapper).factory('BaseService', BaseServiceWrapper).controller('ApplicationController', ApplicationController).controller('AuthController', AuthController).controller('GameGameController', GameGameController).controller('GamesController', GamesController).controller('UserController', UserController).controller('EventController', EventController).controller('CreateEventController', CreateEventController).controller('NavigationController', NavigationController).controller('WishListController', WishListController).controller('CreateWishController', CreateWishController).controller('ProfileController', ProfileController).config(function($routeProvider) {
+this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate', 'ui.bootstrap', 'toaster', 'LocalStorageModule', 'ngFileUpload']).directive('back', HistoryBack).filter('range', RangeFilter).filter('games', GamesFilter).factory('Utility', Utility).factory('AuthService', AuthServiceWrapper).factory('EventService', EventServiceWrapper).factory('GamesService', GamesServiceWrapper).factory('WishService', WishServiceWrapper).factory('UserService', UserServiceWrapper).factory('BaseService', BaseServiceWrapper).controller('ApplicationController', ApplicationController).controller('AuthController', AuthController).controller('GameGameController', GameGameController).controller('GamesController', GamesController).controller('UserController', UserController).controller('EventController', EventController).controller('EventListController', EventListController).controller('CreateEventController', CreateEventController).controller('NavigationController', NavigationController).controller('WishListController', WishListController).controller('CreateWishController', CreateWishController).controller('ProfileController', ProfileController).config(function($routeProvider) {
   $routeProvider.when('/gamegame', {
     templateUrl: 'src/modules/games/gamegame.html',
     controller: 'GameGameController',
@@ -970,7 +1070,13 @@ this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate',
     resolve: GamesController.resolve
   });
   $routeProvider.when('/events', {
-    templateUrl: 'src/modules/events/events.html',
+    templateUrl: 'src/modules/events/eventList.html',
+    controller: 'EventListController',
+    controllerAs: 'vm',
+    resolve: EventListController.resolve
+  });
+  $routeProvider.when('/event/:name', {
+    templateUrl: 'src/modules/events/event.html',
     controller: 'EventController',
     controllerAs: 'vm',
     resolve: EventController.resolve

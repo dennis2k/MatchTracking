@@ -27,6 +27,7 @@ class BaseCollectionService {
         if(!is_null($id))
             $query['_id'] = ($this->generatedId) ? new MongoId($id) : $id;
 
+        $this->applyRules($query);
         $docs = $this->collection->find($query);
         $arr = iterator_to_array($docs,false);
         return $arr;
@@ -35,7 +36,21 @@ class BaseCollectionService {
     public function remove()
     {
         $args = $this->app->request()->params();
-        $id = Param::get($args,'id');
+        $id = Param::get($args,'_id');
+        $docs = $this->query();
+
+        if(!$id)
+            throw new Exception("Id not specified");
+        if(count($docs) != 1)
+            throw new Exception("Entity not found");
+
+        $doc = $docs[0];
+        $doc['delete_time'] = microtime();
+
+        if($this->generatedId)
+            $id = new MongoId($id);
+
+        $this->collection->update(array('_id' => $id),$doc,array('upsert' => true));
         $this->collection->remove(array('_id' => $id));
         return true;
     }
@@ -64,5 +79,10 @@ class BaseCollectionService {
             throw new Exception("Duplicate entry!");
         $this->collection->insert($doc);
         return $doc;
+    }
+
+    public function applyRules(&$query)
+    {
+        $query['delete_time'] = array('$exists' => false);
     }
 }

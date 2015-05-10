@@ -1,87 +1,93 @@
 <div class="content-box">
     <div class="event-container">
         <div class="row">
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <h3>Add game</h3>
+            <div class="col-lg-12">
+                <div class="listWrapper" ng-show="vm.mode == 'list'">
+
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <h3>Games</h3>
+                        <input type="text" placeholder="search" ng-model="vm.query" ng-change="vm.findGameByQuery(vm.query)" class="form-control">
+                        <table class="table">
+                            <tr>
+                                <th>Name</th>
+                                <th>Players</th>
+                                <th>Duration</th>
+                                <th>Image</th>
+                                <th></th>
+                            </tr>
+                            <tr ng-repeat="game in vm.games | orderBy : '_id'">
+                                <td ng-click="vm.newGame = game">{{ game._id }}</td>
+                                <td>{{ game.min_players }} - {{ game.max_players }}</td>
+                                <td>{{ game.duration }}</td>
+                                <td><img ng-src="{{ game.image_url }}" width="25" height="25" class="img-circle shadow" enlarge="" />  </td>
+                                <td>
+                                    <a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeGame(game)"></span> </a>
+                                    <a class="btn btn-xs btn-primary pull-right" style="margin-right: 10px"><span class="glyphicon glyphicon-edit" ng-click="vm.edit(game)"></span> </a>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <button ng-click="vm.mode = 'add'; vm.newGame = {}" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12" ng-show="vm.mode == 'edit' || vm.mode == 'add'">
+                <h3 ng-if="vm.mode == 'add'">Add game</h3>
+                <h3 ng-if="vm.mode == 'edit'">Edit game</h3>
                 <form class="form-horizontal">
                     <fieldset>
 
-                        <!-- Text input-->
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="name">Name</label>
-                            <div class="col-md-4">
-                                <input ng-model="vm.newGame._id" id="name" name="name" type="text" placeholder="" class="form-control input-md" required="">
-
-                            </div>
+                        <label class="control-label" for="name">Name</label>
+                        <div>
+                            <input ng-model="vm.newGame._id" id="name" name="name" type="text" placeholder="" class="form-control input-md" required="">
                         </div>
 
-                        <!-- Text input-->
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="est_duration">Avg duration</label>
-                            <div class="col-md-4">
-                                <input ng-model="vm.newGame.duration" id="est_duration" name="est_duration" type="text" placeholder="" class="form-control input-md" required="">
+                        <label class="control-label" for="est_duration">Duration</label>
+                            <div>
+                                <select name="est_duration" id="est_duration" class="form-control input-md" ng-model="vm.newGame.duration" ng-init="vm.durationOptions[0]" ng-options="item.key as item.text for item in vm.durationOptions"></select>
                             </div>
+                        <span class="help-block">The duration is used in ELO calculation - short games, less impact</span>
+
+                        <label class="control-label" for="random">Random Factor</label>
+                        <div>
+                            <select name="random" id="random" class="form-control input-md" ng-model="vm.newGame.random_factor" ng-init="vm.durationOptions[0]" ng-options="item.key as item.text for item in vm.skillFactorOptions"></select>
+                            <span class="help-block">The random factor is used in ELO calculation - more random, less impact</span>
                         </div>
 
-
-                        <!-- Text input-->
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="est_duration">Min. players</label>
-                            <div class="col-md-4">
+                        <label class="control-label" for="min_players">Min. players</label>
+                            <div>
                                 <input ng-model="vm.newGame.min_players" id="min_players" name="min_players" type="number" placeholder="" class="form-control input-md" required="">
                             </div>
+
+                        <label class="control-label" for="max_players">Max players</label>
+                        <div>
+                            <input ng-model="vm.newGame.max_players" id="max_players" name="max_players" type="number" placeholder="" class="form-control input-md" required="">
                         </div>
 
-                        <!-- Text input-->
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="est_duration">Max players</label>
-                            <div class="col-md-4">
-                                <input ng-model="vm.newGame.max_players" id="max_players" name="max_players" type="number" placeholder="" class="form-control input-md" required="">
+                        <label class="control-label">Image</label>
+                        <div ngf-drop="" ngf-select="" ng-model="vm.files" ng-change="vm.upload(vm.files)" ngf-drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}" class="drop-box" ngf-multiple="true" ngf-allow-dir="true" ngf-accept="'image/*'" ngf-drop-available="true">
+                            <div class="drag-drop-files">Click to select</div>
+                            <img ng-hide="!vm.newGame.image_url" ng-src="{{ vm.newGame.image_url }}" width="100" height="100" class="img-circle"/>
+                        </div>
+                        <div ng-show="vm.newGame.images.length">
+                            <label class="control-label">Selected Images</label>
+                            <div>
+                                <span class="img-frame" ng-repeat="img in vm.newGame.images">
+                                    <img ng-src="{{ img }}" class="img-frame"/>
+                                </span>
                             </div>
                         </div>
 
-                        <!-- Text input-->
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" >Drop Image</label>
-                            <div class="col-md-4">
-                                <div ng-file-drop="vm.uploadFile($files)" class="drag-drop-files" ng-file-drag-over-class="drag-drop-files-over"></div>
-                                <br />
-                                <br />
-                                <img ng-hide="!vm.newGame.image_url" ng-src="{{ vm.newGame.image_url }}" width="100" height="100" class="img-circle"/>
-                            </div>
-                        </div>
 
-
-                        <!-- Button -->
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="submit"></label>
-                            <div class="col-md-4">
-                                <button id="submit" name="submit" class="btn btn-primary" ng-click="vm.saveGame(vm.newGame)">Save</button>
-                            </div>
+                        <div>
+                            <button id="submit" name="submit" class="btn btn-primary" ng-click="vm.saveGame(vm.newGame)">Save</button>
+                            <button class="btn btn-danger" ng-click="vm.mode = 'list'">Back</button>
                         </div>
 
                     </fieldset>
                 </form>
-
-            </div>
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <h3>Games</h3>
-                <table class="table">
-                    <tr>
-                        <th>Name</th>
-                        <th>Players</th>
-                        <th>Duration</th>
-                        <th>Image</th>
-                        <th></th>
-                    </tr>
-                    <tr ng-repeat="game in vm.games | orderBy : '_id'">
-                        <td ng-click="vm.newGame = game">{{ game._id }}</td>
-                        <td>{{ game.min_players }} - {{ game.max_players }}</td>
-                        <td>{{ game.duration }}</td>
-                        <td><img ng-src="{{ game.image_url }}" width="25" height="25" class="img-circle shadow" enlarge="" />  </td>
-                        <td><a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeGame(game)"></span> </a></td>
-                    </tr>
-                </table>
             </div>
         </div>
     </div>

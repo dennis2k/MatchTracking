@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+        <a class="btn btn-primary" href="#/events/create" >Add event</a>
+    </div>
+</div>
+<div class="row">
+    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+        <ul class="event-list">
+            <li ng-repeat="event in vm.events | orderBy : 'start'" style="cursor: pointer;" ng-click="vm.selectEvent(event)">
+                <time>
+                    <span class="day">{{ event.start | date : 'd' }}</span>
+                    <span class="month">{{ event.start | date : 'MMM' }}</span>
+                </time>
+                <img alt="" ng-src="{{ event.image_url || 'asserts/img/event/sadpanda.jpg' }} " />
+                <div class="info">
+                    <h2 class="title">{{ event.name }}</h2>
+                    <p class="desc">{{ event.place }}</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

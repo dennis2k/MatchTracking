@@ -1,0 +1,183 @@
+<div class="row">
+    <div class="col-lg-4" ng-show="vm.currentEvent.name">
+        <img src="{{ vm.currentEvent.image_url }}" class="col-lg-12"/>
+    </div>
+    <div class="col-lg-8">
+        <h1>{{ vm.currentEvent.name }}
+            <button class="btn btn-danger" ng-click="vm.delete(vm.currentEvent)" ng-if="vm.canEdit">Delete</button>
+        </h1>
+        <p>{{ vm.currentEvent.place }}</p>
+        <p>{{ vm.currentEvent.start | date : 'd MMM yyyy' }}</p>
+        <p>{{ vm.currentEvent.end | date : 'd MMM yyyy' }}</p>
+    </div>
+</div>
+
+<div class="col-lg-12" ng-show="vm.currentEvent">
+    <h1>Scoreboard</h1>
+    <table class="table table-hover">
+        <tr>
+            <th>Rank</th>
+            <th>Player name</th>
+            <th>Matches</th>
+            <th>Player rating</th>
+            <th></th>
+        </tr>
+        <tr ng-repeat="player in vm.currentEvent.players | orderBy:'rating':true">
+            <td>{{ $index+1 }} <img src="asserts/img/sheeptrophy.jpg" ng-show="$index == 0" height="30" /></td>
+            <td>{{ player.name}}</td>
+            <td>{{ vm.numMatches(player)}}</td>
+            <td>{{ player.rating}}</td>
+            <td ng-show="vm.root.edit"><a class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-remove" ng-click="vm.removePlayer(player)" ></span> </a></td>
+        </tr>
+    </table>
+
+    <tabset>
+        <tab heading="Add player">
+            <div class="box-padding-md" style="width: 400px">
+                <form class="form-horizontal">
+                    <fieldset>
+                        <!-- Text input-->
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="duration">Player</label>
+                            <div class="col-md-6">
+                                <select ng-model="vm.player._id" id="player" name="player" class="form-control inline-medium" ng-options="player._id as player._id for player in vm.availableUsers() | orderBy:'_id'"></select>
+                                <button class="btn btn-primary" type="button" ng-click="vm.addPlayer(vm.player)" ui-keypress="{13:'vm.addPlayer(vm.player)'}" ng-disabled="!vm.player">Add</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </tab>
+        <tab heading="Add match">
+            <div class="row">
+                <div class="col-lg-12">
+                    <form class="form-horizontal">
+                        <fieldset>
+                            <label class="control-label" for="game">Game</label>
+                            <div>
+                                <input ng-model="vm.match.game" id="game" name="game" type="text" placeholder="" typeahead="game._id for game in vm.getGames($viewValue)" class="form-control input-md">
+                            </div>
+                            <label class="control-label" for="report">Match report</label>
+                            <div>
+                                <textarea ng-model="vm.match.report" class="form-control" id="report" name="report"></textarea>
+                            </div>
+
+                            <label class="control-label" for="duration">Duration</label>
+                            <div>
+                                <input ng-model="vm.match.duration" id="duration" name="duration" type="text" placeholder="" class="form-control input-md">
+                                <span class="help-block">Duration of the game in minutes</span>
+                            </div>
+                            <label class="control-label" for="duration">Images</label>
+                            <div ngf-drop="" ngf-select="" ng-model="vm.match.files" ng-model-rejected="vm.match.rejectedFiles" ngf-drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}" class="drop-box" ngf-multiple="true" ngf-allow-dir="true" ngf-accept="'image/*'" ngf-drop-available="true">
+                                <div class="drag-drop-files">
+                                    Click to select
+                                </div>
+                            </div>
+                            <div ng-show="vm.match.images.length">
+                                <label class="control-label">Selected Images</label>
+                                <div>
+                                        <span class="img-frame" ng-repeat="img in vm.match.images">
+                                            <img ng-src="{{ img }}" class="img-frame"/>
+                                        </span>
+                                </div>
+                            </div>
+
+                        </fieldset>
+                    </form>
+                    <div class="section"></div>
+                </div>
+                <div class="col-lg-12">
+                    <table class="table">
+                        <tr>
+                            <th>Player</th>
+                            <th>Rank</th>
+                            <th>Exclude</th>
+                        </tr>
+                        <tr ng-repeat="player in vm.match.players | orderBy : 'rank'">
+                            <td>{{ player.name }}</td>
+                            <td><select ng-model="player.rank" ng-init="player.rank = $index+1" class="form-control inline-small" ng-options="n for n in [] | range:vm.currentEvent.players.length" ng-disabled="player.is_not_participating" ></select></td>
+                            <td><input type="checkbox" ng-model="player.is_not_participating" ng-checked="player.is_not_participating" ng-click="player.is_not_participating ? player.rank = '' : player.rank = $index+1"></td>
+                        </tr>
+                    </table>
+                    <button class="btn btn-primary" ng-click="vm.addMatch(vm.match)">Add match</button>
+                </div>
+            </div>
+        </tab>
+        <tab heading="Matches">
+            <div class="box-padding-md">
+                <div class="panel panel-primary" ng-repeat="match in vm.currentEvent.matches | orderBy:'timestamp':true">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{ match.game }}
+                            <a ng-show="vm.canEdit()" class="btn btn-xs btn-danger pull-right">
+                                <span class="glyphicon glyphicon-remove" ng-click="vm.removeMatch(match)"></span>
+                            </a>
+                            <a ng-show="vm.root.edit" class="btn btn-xs btn-info pull-right pad">
+                                <span class="glyphicon glyphicon-backward" ng-click="vm.revertMatch(match)"></span>
+                            </a>
+                            <a class="btn btn-xs btn-info pull-right pad">
+                                <span class="glyphicon glyphicon-minus" data-toggle="collapse" href="#match_{{ $index }}" aria-expanded="false" aria-controls="match_{{ $index }}"></span>
+                            </a>
+                        </h3>
+                    </div>
+                    <div class="panel-body collapse" id="match_{{ $index }}" aria-labelledby="match_{{ $index }}" >
+                        <div class="row">
+                            <div class="col-md-2">
+                                <img ng-src="{{ vm.getGameImage(match.game) }}" width="100" height="100" class="img-circle shadow" />
+                            </div>
+                            <div class="col-md-8">
+                                <table class="table">
+                                    <tr>
+                                        <td style="width: 100px">Winner</td>
+                                        <td class="text-success" style="font-weight: bold;">{{ match.players[0].name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 100px">Game</td>
+                                        <td>{{ match.game }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 100px">Duration</td>
+                                        <td>{{ match.duration }} minutes</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 100px">Timestamp</td>
+                                        <td>{{ match.timestamp | date :'d MMM yyyy HH:mm' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 100px">Report</td>
+                                        <td>{{ match.report }}</td>
+                                    </tr>
+                                </table>
+                                <div class="section"></div>
+                                <h3>Result</h3>
+                                <table class="table">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>New Rating</th>
+                                        <th>Old Rating</th>
+                                    </tr>
+                                    <tr ng-class="{ 'success' : $index == 0 }" ng-repeat="player in match.players | orderBy:'rank'">
+                                        <td>{{ player.rank }}</td>
+                                        <td>{{ player.name }}</td>
+                                        <td>{{ player.new_rating }} ({{ player.adjustment }})<img ng-src="{{ player.new_rating > player.rating ? 'asserts/img/green-arrow.png' : 'asserts/img/arrow-red.png' }}" height="10" class="pull-right" style="margin-right: 50%" /></td>
+                                        <td>{{ player.rating }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2">
+                                <h3>Images</h3>
+                                    <span ng-repeat="img in match.images" class="img-frame" ng-click="vm.selectImage(img)">
+                                        <img ng-src="{{ img }}" width="150" height="150"  />
+                                    </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tab>
+    </tabset>
+    <div class="section"></div>
+    <div class="section"></div>
+</div>

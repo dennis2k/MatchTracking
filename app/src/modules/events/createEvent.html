@@ -1,29 +1,32 @@
 <div class="row">
-    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-        <h3>Details</h3>
-        <form class="form-horizontal">
-            <label for="event_name">Event name</label>
-            <input ng-model="vm.event.name" id="event_name" name="event_name" type="text" placeholder="" class="form-control input-md" required="">
+    <form class="form-horizontal" name="vm.form" novalidate="">
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <h3>Details</h3>
+                <label for="event_name">Event name</label>
+                <input ng-model="vm.event.name" id="event_name" name="event_name" type="text" placeholder="" class="form-control input-md" ng-required="true">
 
-            <label for="place">Place</label>
-            <input ng-model="vm.event.place" id="place" name="place" type="text" placeholder="" class="form-control input-md">
+                <label for="place">Place</label>
+                <input ng-model="vm.event.place" id="place" name="place" type="text" placeholder="" class="form-control input-md">
 
-            <label for="place">Image</label>
-            <input id="image" name="image" type="file" placeholder="" class="form-control input-md">
+                <label class="control-label">Image</label>
+                <div ngf-drop="" ngf-select="" ng-model="vm.files" ng-change="vm.upload(vm.files)" ngf-drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}" class="drop-box"  ngf-accept="'image/*'" ngf-drop-available="true">
+                    <div class="drag-drop-files">Click to select</div>
+                    <span class="img-frame">
+                        <img ng-hide="!vm.event.image_url" ng-src="{{ vm.event.image_url }}" width="100" height="100"/>
+                    </span>
+                </div>
 
-            <label for="start">Begin date</label>
-            <input ng-model="vm.event.start" id="start" name="start" type="text" placeholder="dd-mm-yyyy" class="form-control input-md">
-            <span class="help-block">First day of the event</span>
+                <label for="start">Start</label>
+                <input id="start" type="date" class="form-control" ng-model="vm.event.start" required="true" />
+                <span class="help-block">First day of the event</span>
 
-            <label for="end">End date</label>
-            <input ng-model="vm.event.end" id="end" name="end" type="text" placeholder="dd-mm-yyyy" class="form-control input-md">
-            <span class="help-block">Last day of the event</span>
-        </form>
-    </div>
-    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-        <h3>Participants</h3>
-        <form class="form-horizontal">
+                <label for="end">End</label>
+                <input id="end" type="date" class="form-control" ng-model="vm.event.end" required="true" />
+                <span class="help-block">Last day of the event</span>
 
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <h3>Participants</h3>
             <table class="table">
                 <tr>
                     <th>User</th>
@@ -34,9 +37,9 @@
                     <td><input type="checkbox" ng-model="user.include" ng-checked="user.include"></td>
                 </tr>
             </table>
-        </form>
-    </div>
-    <div class="col-lg-12">
-        <button class="btn btn-primary pull-right" ng-click="vm.saveEvent(vm.event)">Save</button>
-    </div>
+        </div>
+        <div class="col-lg-12">
+            <button type="submit" class="btn btn-primary pull-right" ng-click="vm.saveEvent(vm.event)">Save</button>
+        </div>
+    </form>
 </div>

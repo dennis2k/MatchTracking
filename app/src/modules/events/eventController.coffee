@@ -1,38 +1,32 @@
-@EventController = ($rootScope, $filter,$scope, toaster, EventService, GamesService, eventList, gamesList, userList,Utility) ->
+@EventController = (event, $rootScope, $filter,$scope, $location, toaster, EventService, GamesService, eventList, gamesList, userList,Utility) ->
   vm = this
-  vm.events = eventList.data
   vm.games = gamesList.data
   vm.users = userList.data
-  vm.currentEvent = {}
-  vm.match = {}
+  vm.currentEvent = event.data[0]
+  vm.match = { players : vm.currentEvent.players }
   vm.root = $rootScope;
 
-  # Load event data
-  loadEvent = (event) ->
-    params =
-      _id : event._id.$id
-    EventService.query(params).then((result) ->
-      vm.currentEvent = result.data.pop()
-      vm.match.players = vm.currentEvent.players
-    )
+  vm.selectEvent = (event) ->
+    $location.path('/event/' + event.name)
+
 
   # Add a player to the event
-  addPlayer = (player) ->
+  vm.addPlayer = (player) ->
     return null if !player?
     vm.currentEvent.players.push(player)
     EventService.addPlayer(vm.currentEvent._id.$id,player._id).then((result) ->
       vm.currentEvent = result.data if result.status
       vm.player = null;
-    );
+    )
 
   # Removes a player from the event
-  removePlayer = (player) ->
+  vm.removePlayer = (player) ->
     EventService.removePlayer(vm.currentEvent._id.$id,player).then((result) ->
       vm.currentEvent = result.data if result.status
     )
 
   # Adds a player to a match
-  addPlayerToMatch = (player) ->
+  vm.addPlayerToMatch = (player) ->
     vm.match.players = [] if !vm.match.players?
     filteredArray = $filter('filter')(vm.currentEvent.players,{name : player.name})
     matchPlayer = filteredArray.pop()
@@ -40,12 +34,12 @@
     vm.match.players.push(angular.copy(matchPlayer))
 
   # Removes a player from a match
-  removePlayerFromMatch = (player) ->
+  vm.removePlayerFromMatch = (player) ->
     idx = vm.match.players.indexOf(player)
     vm.match.players.splice(idx,1);
 
   # Adds a match to the event
-  addMatch = (match) ->
+  vm.addMatch = (match) ->
     filteredPlayers = $filter('filter')(match.players,(player) ->
       if player.rank == ''
         return false
@@ -72,13 +66,13 @@
       toaster.pop('info',"Info","Match was added !")
     )
   # Removes a match from an event
-  removeMatch = (match) ->
+  vm.removeMatch = (match) ->
     EventService.removeMatch(vm.currentEvent._id.$id,match.uid).then((result) ->
       vm.currentEvent = result.data if result.status
     )
 
   #Roll back the points given to players paticipating in this game and delete the game
-  revertMatch = (match) ->
+  vm.revertMatch = (match) ->
     angular.forEach match.players, (player) ->
       eventPlayer = $filter('filter')(vm.currentEvent.players,{name : player.name})
       eventPlayer = eventPlayer.pop()
@@ -89,13 +83,13 @@
       removeMatch(match)
 
   # Auto complete searching for games
-  getGames = (input) ->
+  vm.getGames = (input) ->
     GamesService.findGamesByName(input).then((result) ->
       result.data
     )
 
   #get the image of a game
-  getGameImage = (game) ->
+  vm.getGameImage = (game) ->
 
     filteredArray = $filter('filter')(vm.games,{_id : game})
     game = filteredArray.pop()
@@ -103,11 +97,11 @@
     game.image_url || "";
 
   #Calculate the number of matches for a player
-  numMatches = (player) ->
+  vm.numMatches = (player) ->
     count = 0
     angular.forEach(vm.currentEvent.matches,(match,mindex) ->
       angular.forEach(match.players,(p,pindex) ->
-         count++ if p.name == player.name
+        count++ if p.name == player.name
       )
     )
     count
@@ -115,7 +109,7 @@
   ###
     Get a filtered list of users that are not already in the current event
   ###
-  availableUsers = () ->
+  vm.availableUsers = () ->
     usersToSelect = $filter('filter')(vm.users,(user) ->
       found = false
       angular.forEach(vm.currentEvent.players,(eventPlayer) ->
@@ -126,9 +120,13 @@
     )
     usersToSelect
 
-  canEdit = () ->
+  vm.canEdit = () ->
     ($rootScope.user.admin || $rootScope.user._id == vm.currentEvent.owner )
 
+  vm.delete = (event) ->
+    EventService.delete(event._id.$id).then((response) ->
+        $location.path('/events')
+    )
   $scope.$watch('vm.match.files', () ->
     vm.upload(vm.match.files)
   )
@@ -136,27 +134,11 @@
   vm.upload = (files) ->
     vm.match.images = []
     if (files && files.length)
-       angular.forEach(files,(file) ->
-         Utility.upload(file,'match').then((response) ->
+      angular.forEach(files,(file) ->
+        Utility.upload(file,'match').then((response) ->
           vm.match.images.push(response.data.data)
         ))
 
-
-
-  # API
-  vm.availableUsers = availableUsers
-  vm.addPlayerToMatch = addPlayerToMatch
-  vm.removePlayerFromMatch = removePlayerFromMatch
-  vm.loadEvent = loadEvent
-  vm.addPlayer = addPlayer
-  vm.removePlayer = removePlayer
-  vm.addMatch = addMatch
-  vm.removeMatch = removeMatch
-  vm.revertMatch = revertMatch
-  vm.getGames = getGames
-  vm.getGameImage = getGameImage
-  vm.numMatches = numMatches
-  vm.canEdit = canEdit
   vm
 EventController.resolve =
   eventList : (EventService,$rootScope) ->
@@ -166,3 +148,6 @@ EventController.resolve =
     GamesService.query()
   userList : (UserService) ->
     UserService.query()
+  event : ($location,EventService) ->
+    parts = $location.$$url.split('/')
+    EventService.query({_id : parts[2]})

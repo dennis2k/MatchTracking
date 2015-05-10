@@ -1,4 +1,4 @@
-@BaseServiceWrapper = ($http, $q, $upload,toaster) ->
+@BaseServiceWrapper = ($http, $q,toaster) ->
 
   #All services inherit common API calls
   class @BaseService
@@ -35,4 +35,4 @@
     update : (params) ->
       request('post', @route + "/update",params)
     delete : (id) ->
-      request('post', @route + "/remove",{id : id})
+      request('post', @route + "/remove",{_id : id})
