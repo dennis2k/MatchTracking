@@ -1,12 +1,16 @@
 <div class="row">
     <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
-        <a class="btn btn-primary" href="#/events/create" >Add event</a>
+        <a class="btn btn-primary pull-right" href="#/events/create"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
     </div>
 </div>
-<div class="row">
+
+<div class="row v-offset-top-1">
     <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
         <ul class="event-list">
-            <li ng-repeat="event in vm.events | orderBy : 'start'" style="cursor: pointer;" ng-click="vm.selectEvent(event)">
+            <li ng-repeat="event in vm.events | orderBy : 'start'" style="cursor: pointer;" ng-class="{'grayed' : event.end < vm.now}" ng-click="vm.selectEvent(event)">
+                <div class="stamped" ng-show="event.end < vm.now">
+                    Finished
+                </div>
                 <time>
                     <span class="day">{{ event.start | date : 'd' }}</span>
                     <span class="month">{{ event.start | date : 'MMM' }}</span>

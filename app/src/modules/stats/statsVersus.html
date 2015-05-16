@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-5">
+            <label class="control-label" for="player1">Player 1</label>
+            <div>
+                <select id="player1" ng-model="vm.player1" ng-options="p._id as p._id for p in vm.getPlayerList(vm.player2)" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-lg-2 text-center"><h3>VS</h3></div>
+        <div class="col-lg-5">
+            <label class="control-label" for="player2">Player 2</label>
+            <div>
+                <select id="player2" ng-model="vm.player2" ng-options="p._id as p._id for p in vm.getPlayerList(vm.player1)" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="section"></div>
+            <label class="control-label" for="game">Game</label>
+            <div>
+                <select id="game" ng-model="vm.game" ng-options="game._id as game._id for game in vm.gamesList" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-lg-12 text-center">
+            <div class="section"></div>
+            <button class="btn btn-primary" ng-click="vm.fight(vm.player1, vm.player2)">Fight !!</button>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+    </div>
+</div>

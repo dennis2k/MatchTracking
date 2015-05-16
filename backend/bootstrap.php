@@ -19,6 +19,7 @@ header('Content-Type: application/json');
 $m = new MongoClient();
 $db = $m->matchtracker;
 
+
 try {
     foreach (glob("../backend/routes/*.php") as $filename)
         include $filename;

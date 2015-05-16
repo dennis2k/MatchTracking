@@ -104,7 +104,13 @@ this.NavigationController = function($rootScope, $location, EventService) {
   var nav;
   nav = this;
   nav.isActive = function(viewLocation) {
-    return viewLocation === $location.path();
+    if (viewLocation === $location.path()) {
+      return true;
+    }
+    if ($location.path().indexOf(viewLocation) > -1) {
+      return true;
+    }
+    return false;
   };
   nav.cheat = function(code) {
     return EventService.cheat(code).then(function(result) {
@@ -385,6 +391,7 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
     players: vm.currentEvent.players
   };
   vm.root = $rootScope;
+  vm.now = new Date().getTime();
   vm.selectEvent = function(event) {
     return $location.path('/event/' + event.name);
   };
@@ -583,6 +590,7 @@ this.EventListController = function($location, EventService, eventList) {
   var vm;
   vm = this;
   vm.events = eventList.data;
+  vm.now = new Date().getTime();
   vm.selectEvent = function(event) {
     return $location.path('/event/' + event._id.$id);
   };
@@ -926,14 +934,88 @@ this.GamesServiceWrapper = function(BaseService) {
   return new GamesService('games');
 };
 
-this.ProfileController = function($rootScope, UserService) {
+this.StatsVersusController = function($rootScope, $filter, users, games, EventService) {
   var vm;
   vm = this;
-  vm.user = $rootScope.user;
-  return console.log(vm.user, $rootScope.user);
+  vm.playerList = users.data;
+  vm.gamesList = games.data;
+  vm.gamesList.unshift({
+    _id: 'Any Game'
+  });
+  vm.getPlayerList = function(player) {
+    var list;
+    list = $filter('filter')(vm.playerList, function(element) {
+      return player !== element._id;
+    });
+    return list;
+  };
+  vm.fight = function(player1, player2) {
+    return EventService.query({
+      query: {
+        "matches.players.name": {
+          $all: [player1, player2]
+        }
+      }
+    }).then(function(response) {
+      return console.log(response);
+    });
+  };
+  return vm;
 };
 
-ProfileController.resolve = {};
+StatsVersusController.resolve = {
+  users: function(UserService) {
+    return UserService.query();
+  },
+  games: function(GamesService) {
+    return GamesService.query();
+  }
+};
+
+this.ProfileController = function($scope, $rootScope, user, UserService, Utility) {
+  var vm;
+  vm = this;
+  vm.user = user.data[0];
+  vm.is_self = $rootScope.user._id === vm.user._id;
+  vm.getAvatar = function(user) {
+    if (angular.isDefined(user.image_url)) {
+      return user.image_url;
+    }
+    return "asserts/img/user/default_user.jpg";
+  };
+  vm.upload = function(files) {
+    if (angular.isUndefined(vm.user.images)) {
+      vm.user.images = [];
+    }
+    if (files && files.length) {
+      return angular.forEach(files, function(file) {
+        return Utility.upload(file, 'user').then(function(response) {
+          vm.user.image_url = response.data.data;
+          return UserService.update({
+            _id: vm.user._id,
+            doc: vm.user
+          });
+        });
+      });
+    }
+  };
+  $scope.$watch('vm.files', function(n, o) {
+    if (n !== o && n !== null && angular.isDefined(n)) {
+      return vm.upload(vm.files);
+    }
+  });
+  return vm;
+};
+
+ProfileController.resolve = {
+  user: function($location, UserService) {
+    var parts;
+    parts = $location.$$url.split('/');
+    return UserService.query({
+      _id: parts[2]
+    });
+  }
+};
 
 this.UserController = function($filter, userList, UserService) {
   var remove, save, vm;
@@ -1056,7 +1138,7 @@ this.WishServiceWrapper = function(BaseService) {
   return new WishService('wishe');
 };
 
-this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate', 'ui.bootstrap', 'toaster', 'LocalStorageModule', 'ngFileUpload']).directive('back', HistoryBack).filter('range', RangeFilter).filter('games', GamesFilter).factory('Utility', Utility).factory('AuthService', AuthServiceWrapper).factory('EventService', EventServiceWrapper).factory('GamesService', GamesServiceWrapper).factory('WishService', WishServiceWrapper).factory('UserService', UserServiceWrapper).factory('BaseService', BaseServiceWrapper).controller('ApplicationController', ApplicationController).controller('AuthController', AuthController).controller('GameGameController', GameGameController).controller('GamesController', GamesController).controller('UserController', UserController).controller('EventController', EventController).controller('EventListController', EventListController).controller('CreateEventController', CreateEventController).controller('NavigationController', NavigationController).controller('WishListController', WishListController).controller('CreateWishController', CreateWishController).controller('ProfileController', ProfileController).config(function($routeProvider) {
+this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate', 'ui.bootstrap', 'toaster', 'LocalStorageModule', 'ngFileUpload']).directive('back', HistoryBack).filter('range', RangeFilter).filter('games', GamesFilter).factory('Utility', Utility).factory('AuthService', AuthServiceWrapper).factory('EventService', EventServiceWrapper).factory('GamesService', GamesServiceWrapper).factory('WishService', WishServiceWrapper).factory('UserService', UserServiceWrapper).factory('BaseService', BaseServiceWrapper).controller('ApplicationController', ApplicationController).controller('AuthController', AuthController).controller('GameGameController', GameGameController).controller('GamesController', GamesController).controller('UserController', UserController).controller('EventController', EventController).controller('EventListController', EventListController).controller('CreateEventController', CreateEventController).controller('NavigationController', NavigationController).controller('WishListController', WishListController).controller('CreateWishController', CreateWishController).controller('ProfileController', ProfileController).controller('StatsVersusController', StatsVersusController).config(function($routeProvider) {
   $routeProvider.when('/gamegame', {
     templateUrl: 'src/modules/games/gamegame.html',
     controller: 'GameGameController',
@@ -1102,7 +1184,7 @@ this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate',
     templateUrl: 'src/modules/users/users.html',
     controller: 'UserController',
     controllerAs: 'vm',
-    requireAdmin: true,
+    requireAdmin: false,
     resolve: UserController.resolve
   });
   $routeProvider.when('/login', {
@@ -1110,10 +1192,17 @@ this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate',
     controller: 'AuthController',
     controllerAs: 'vm'
   });
-  $routeProvider.when('/profile', {
+  $routeProvider.when('/profile/:name', {
     templateUrl: 'src/modules/users/profile.html',
     controller: 'ProfileController',
-    controllerAs: 'vm'
+    controllerAs: 'vm',
+    resolve: ProfileController.resolve
+  });
+  $routeProvider.when('/stats/versus', {
+    templateUrl: 'src/modules/stats/statsVersus.html',
+    controller: 'StatsVersusController',
+    controllerAs: 'vm',
+    resolve: StatsVersusController.resolve
   });
   return $routeProvider.otherwise({
     redirectTo: '/events'

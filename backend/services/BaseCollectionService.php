@@ -51,7 +51,6 @@ class BaseCollectionService {
             $id = new MongoId($id);
 
         $this->collection->update(array('_id' => $id),$doc,array('upsert' => true));
-        $this->collection->remove(array('_id' => $id));
         return true;
     }
 

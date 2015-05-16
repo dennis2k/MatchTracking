@@ -1,14 +1,19 @@
 <div class="row">
     <div class="col-lg-4" ng-show="vm.currentEvent.name">
+        <div class="stamped" ng-if="vm.currentEvent.end < vm.now">
+            Finished
+        </div>
         <img src="{{ vm.currentEvent.image_url }}" class="col-lg-12"/>
     </div>
-    <div class="col-lg-8">
+    <div class="col-lg-7">
         <h1>{{ vm.currentEvent.name }}
-            <button class="btn btn-danger" ng-click="vm.delete(vm.currentEvent)" ng-if="vm.canEdit">Delete</button>
         </h1>
         <p>{{ vm.currentEvent.place }}</p>
         <p>{{ vm.currentEvent.start | date : 'd MMM yyyy' }}</p>
         <p>{{ vm.currentEvent.end | date : 'd MMM yyyy' }}</p>
+    </div>
+    <div class="col-lg-1">
+        <button class="btn btn-danger" ng-click="vm.delete(vm.currentEvent)" ng-if="vm.canEdit"><span class="glyphicon glyphicon-remove"</button>
     </div>
 </div>
 
@@ -24,7 +29,7 @@
         </tr>
         <tr ng-repeat="player in vm.currentEvent.players | orderBy:'rating':true">
             <td>{{ $index+1 }} <img src="asserts/img/sheeptrophy.jpg" ng-show="$index == 0" height="30" /></td>
-            <td>{{ player.name}}</td>
+            <td><a ng-href="#/profile/{{ player.name }}">{{ player.name}}</a></td>
             <td>{{ vm.numMatches(player)}}</td>
             <td>{{ player.rating}}</td>
             <td ng-show="vm.root.edit"><a class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-remove" ng-click="vm.removePlayer(player)" ></span> </a></td>
@@ -105,6 +110,7 @@
         </tab>
         <tab heading="Matches">
             <div class="box-padding-md">
+                <div ng-hide="vm.currentEvent.matches.length > 0">No matches</div>
                 <div class="panel panel-primary" ng-repeat="match in vm.currentEvent.matches | orderBy:'timestamp':true">
                     <div class="panel-heading">
                         <h3 class="panel-title">{{ match.game }}

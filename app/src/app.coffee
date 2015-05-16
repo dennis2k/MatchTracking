@@ -21,6 +21,7 @@
   .controller('WishListController',WishListController)
   .controller('CreateWishController',CreateWishController)
   .controller('ProfileController',ProfileController)
+  .controller('StatsVersusController',StatsVersusController)
   .config(($routeProvider) ->
         $routeProvider.when('/gamegame',{templateUrl : 'src/modules/games/gamegame.html',controller : 'GameGameController', controllerAs : 'vm', resolve : GameGameController.resolve})
         $routeProvider.when('/games',{templateUrl : 'src/modules/games/games.html',controller : 'GamesController', controllerAs : 'vm', resolve : GamesController.resolve})
@@ -35,9 +36,10 @@
         $routeProvider.when('/events/create',{templateUrl : 'src/modules/events/createEvent.html',controller : 'CreateEventController', controllerAs : 'vm', resolve : CreateEventController.resolve})
         $routeProvider.when('/wishlist',{templateUrl : 'src/modules/wishes/wishList.html',controller : 'WishListController', controllerAs : 'vm', resolve : WishListController.resolve})
         $routeProvider.when('/createWish',{templateUrl : 'src/modules/wishes/createWish.html',controller : 'CreateWishController', controllerAs : 'vm'})
-        $routeProvider.when('/users',{templateUrl : 'src/modules/users/users.html',controller : 'UserController', controllerAs : 'vm', requireAdmin : true, resolve : UserController.resolve})
+        $routeProvider.when('/users',{templateUrl : 'src/modules/users/users.html',controller : 'UserController', controllerAs : 'vm', requireAdmin : false, resolve : UserController.resolve})
         $routeProvider.when('/login',{templateUrl : 'src/modules/auth/login.html',controller : 'AuthController', controllerAs : 'vm'})
-        $routeProvider.when('/profile',{templateUrl : 'src/modules/users/profile.html',controller : 'ProfileController', controllerAs : 'vm'})
+        $routeProvider.when('/profile/:name',{templateUrl : 'src/modules/users/profile.html',controller : 'ProfileController', controllerAs : 'vm', resolve : ProfileController.resolve})
+        $routeProvider.when('/stats/versus',{templateUrl : 'src/modules/stats/statsVersus.html',controller : 'StatsVersusController', controllerAs : 'vm', resolve : StatsVersusController.resolve})
         $routeProvider.otherwise({redirectTo: '/events'})
   )
   .config((localStorageServiceProvider) ->

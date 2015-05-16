@@ -1,6 +1,7 @@
 <div class="row">
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" >
-        <img class="img-circle" src="asserts/img/decent.jpg">
+        <img ng-if="vm.is_self" class="img-circle" ng-src="{{ vm.getAvatar(vm.user) }}"  ngf-select="" ng-model="vm.files" ngf-accept="'image/*'">
+        <img ng-if="!vm.is_self" class="img-circle" ng-src="{{ vm.getAvatar(vm.user) }}"  >
     </div>
     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" >
         <table class="table">

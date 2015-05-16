@@ -5,6 +5,7 @@
   vm.currentEvent = event.data[0]
   vm.match = { players : vm.currentEvent.players }
   vm.root = $rootScope;
+  vm.now = new Date().getTime()
 
   vm.selectEvent = (event) ->
     $location.path('/event/' + event.name)

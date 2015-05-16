@@ -2,6 +2,8 @@
   vm = this
   vm.events = eventList.data
 
+  vm.now = new Date().getTime()
+
   vm.selectEvent = (event) ->
     $location.path('/event/' + event._id.$id)
 
