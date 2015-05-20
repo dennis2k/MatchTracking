@@ -36,3 +36,10 @@
       request('post', @route + "/update",params)
     delete : (id) ->
       request('post', @route + "/remove",{_id : id})
+
+    get : (url, params) ->
+      request('get',@route + url,params)
+    post : (url, params) ->
+      request('post',@route + url,params)
+
+

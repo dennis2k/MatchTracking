@@ -8,7 +8,7 @@ $app->get("/stats/versus",function() use ($app,$service) {
     $player1 = Param::get($args,'player1');
     $player2 = Param::get($args,'player2');
     $game = Param::get($args,'game');
-
-    $service->versus($player1,$player2);
+    $matches = $service->versus($player1,$player2,$game);
+    JSON::success($matches);
 
 });

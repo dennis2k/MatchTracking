@@ -11,16 +11,21 @@ $app->post("/users/create",function() use ($app,$service) {
     if($admin == true)
         $user['admin'] = true;
     $doc = $service->insert($user);
+    unset($doc['password']);
     JSON::success($doc);
 
 });
 $app->post("/users/update",function() use ($service) {
     $doc = $service->update();
+    unset($doc['password']);
     JSON::success($doc);
 });
 
 $app->get("/users/query",function() use ($service) {
     $docs = $service->query();
+    foreach ($docs as &$doc) {
+        unset($doc['password']);
+    }
     JSON::success($docs);
 });
 $app->post("/users/remove",function() use ($service) {

@@ -1,4 +1,4 @@
-@UserController = ($filter,userList,UserService) ->
+@UserController = ($filter,userList,UserService, ToasterService) ->
   vm = this
 
   vm.users = userList.data
@@ -9,9 +9,12 @@
     if existing.length == 0
       UserService.insert(user).then((result) ->
         vm.users.push(result.data) if result.status
+        ToasterService.info("User created!")
       )
     else
-      UserService.update({_id : user._id, doc : user} )
+      UserService.update({_id : user._id, doc : user}).then((response) ->
+        ToasterService.info("User updated!")
+      )
 
   remove = (user) ->
     UserService.delete(user._id).then(() ->

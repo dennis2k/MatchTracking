@@ -22,10 +22,18 @@
         </div>
         <div class="col-lg-12 text-center">
             <div class="section"></div>
-            <button class="btn btn-primary" ng-click="vm.fight(vm.player1, vm.player2)">Fight !!</button>
+            <button class="btn btn-primary" ng-click="vm.fight(vm.player1, vm.player2,vm.game)" ng-disabled="!vm.player1 || !vm.player2">Fight !!</button>
         </div>
     </div>
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
+</div>
+<div class="row">
+    <div class="col-lg-4">
+        <canvas legend="true" id="p1-ratio" class="chart chart-doughnut" data="vm.p1.ratio" labels="vm.ratioLabels"></canvas>
+    </div>
+    <div class="col-lg-4">
+        <canvas legend="true" id="game-breakdown" class="chart chart-doughnut" data="vm.gameCount" labels="vm.gameLabels"></canvas>
+    </div>
+    <div class="col-lg-4">
+        <canvas legend="true" id="p2-ratio" class="chart chart-doughnut" data="vm.p2.ratio" labels="vm.ratioLabels"></canvas>
     </div>
 </div>

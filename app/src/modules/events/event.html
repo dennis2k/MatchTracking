@@ -100,7 +100,7 @@
                         </tr>
                         <tr ng-repeat="player in vm.match.players | orderBy : 'rank'">
                             <td>{{ player.name }}</td>
-                            <td><select ng-model="player.rank" ng-init="player.rank = $index+1" class="form-control inline-small" ng-options="n for n in [] | range:vm.currentEvent.players.length" ng-disabled="player.is_not_participating" ></select></td>
+                            <td><select ng-model="player.rank" class="form-control inline-small" ng-options="n for n in [] | range:vm.currentEvent.players.length" ng-disabled="player.is_not_participating" ></select></td>
                             <td><input type="checkbox" ng-model="player.is_not_participating" ng-checked="player.is_not_participating" ng-click="player.is_not_participating ? player.rank = '' : player.rank = $index+1"></td>
                         </tr>
                     </table>

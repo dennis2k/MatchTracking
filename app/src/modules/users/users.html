@@ -8,21 +8,17 @@
                     <fieldset>
 
                             <label class="control-label" for="username">Username</label>
-
-                                <input ng-model="vm.newUser._id" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
-
+                            <input ng-model="vm.newUser._id" id="username" name="username" type="text" placeholder="Username" class="form-control input-md" required="">
 
                             <label class="control-label" for="password">Password</label>
-
-                                <input ng-model="vm.newUser.password" id="password" name="password" type="password" class="form-control input-md" required="">
+                            <input ng-model="vm.newUser.password" id="password" name="password" type="password" class="form-control input-md" required="">
 
                             <label class="control-label" for="password">Admin</label>
-
                             <input ng-model="vm.newUser.admin" id="admin" name="admin" type="checkbox" class="" ng-true-value="true" ng-false-value="false">
 
                             <br />
                             <br />
-                            <button id="submit" class="btn btn-primary" ng-click="vm.save(vm.newUser)">Save</button>
+                            <button id="submit" class="btn btn-primary" ng-click="vm.save(vm.newUser)" ng-disabled="!vm.newUser._id || !vm.newUser.password">Save</button>
 
                     </fieldset>
                 </form>

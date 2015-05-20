@@ -27,12 +27,3 @@ $app->post("/games/remove",function() use ($service) {
     $service->remove();
     JSON::success();
 });
-$app->post("/games/upload",function() {
-    if(!isset($_FILES))
-        throw new Exception("Uploaded file not found");
-    $file = array_pop($_FILES);
-    $fileUpload = new FileUpload();
-    $fileUpload->load($file);
-    $fileUpload->move("/var/www/matchtracker/app/img");
-    JSON::success($fileUpload->getPath());
-});

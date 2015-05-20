@@ -95,6 +95,14 @@ this.BaseServiceWrapper = function($http, $q, toaster) {
       });
     };
 
+    BaseService.prototype.get = function(url, params) {
+      return request('get', this.route + url, params);
+    };
+
+    BaseService.prototype.post = function(url, params) {
+      return request('post', this.route + url, params);
+    };
+
     return BaseService;
 
   })();
@@ -134,6 +142,21 @@ this.RangeFilter = function() {
     return input;
   };
   return filter;
+};
+
+this.ToasterService = function(toaster) {
+  var service;
+  service = {};
+  service.info = function(message) {
+    return toaster.pop('info', 'Info', message);
+  };
+  service.warning = function(message) {
+    return toaster.pop('warning', 'Warning!', message);
+  };
+  service.error = function(message) {
+    return toaster.pop('error', 'Error!', message);
+  };
+  return service;
 };
 
 this.Utility = function(Upload) {
@@ -934,11 +957,106 @@ this.GamesServiceWrapper = function(BaseService) {
   return new GamesService('games');
 };
 
-this.StatsVersusController = function($rootScope, $filter, users, games, EventService) {
+var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+this.StatsServiceWrapper = function(BaseService, $q, $filter) {
+  var StatsService;
+  StatsService = (function(superClass) {
+    var getPlayerRank, parseVersusResult;
+
+    extend(StatsService, superClass);
+
+    function StatsService() {
+      return StatsService.__super__.constructor.apply(this, arguments);
+    }
+
+    getPlayerRank = function(player, match) {
+      var players;
+      players = $filter('filter')(match.players, function(p) {
+        return p.name === player;
+      });
+      return players[0].rank;
+    };
+
+    parseVersusResult = function(p1, p2, matches) {
+      var result;
+      result = {
+        games: {}
+      };
+      result[p1] = {
+        wins: 0,
+        draws: 0,
+        loss: 0
+      };
+      result[p2] = {
+        wins: 0,
+        draws: 0,
+        loss: 0
+      };
+      angular.forEach(matches, function(match) {
+        var p1Rank, p2Rank;
+        if (angular.isDefined(match.game)) {
+          if (angular.isDefined(result.games[match.game])) {
+            result.games[match.game]++;
+          } else {
+            result.games[match.game] = 1;
+          }
+        }
+        p1Rank = getPlayerRank(p1, match);
+        p2Rank = getPlayerRank(p2, match);
+        if (p1Rank === p2Rank) {
+          result[p1].draws++;
+          result[p2].draws++;
+        }
+        if (p1Rank > p2Rank) {
+          result[p1].wins++;
+          result[p2].loss++;
+        }
+        if (p2Rank > p1Rank) {
+          result[p1].loss++;
+          return result[p2].wins++;
+        }
+      });
+      return result;
+    };
+
+    StatsService.prototype.versus = function(p1, p2, game) {
+      var defer;
+      if (game == null) {
+        game = null;
+      }
+      defer = $q.defer();
+      this.get('/versus', {
+        player1: p1,
+        player2: p2,
+        game: game
+      }).then(function(response) {
+        return defer.resolve(parseVersusResult(p1, p2, response.data));
+      }, function(response) {
+        return defer.reject(response);
+      });
+      return defer.promise;
+    };
+
+    return StatsService;
+
+  })(BaseService);
+  return new StatsService('stats');
+};
+
+this.StatsVersusController = function($rootScope, $filter, users, games, StatsService) {
   var vm;
   vm = this;
   vm.playerList = users.data;
   vm.gamesList = games.data;
+  vm.ratioLabels = ['Wins', 'Loss', 'Draws'];
+  vm.p1 = {
+    ratio: []
+  };
+  vm.p2 = {
+    ratio: []
+  };
   vm.gamesList.unshift({
     _id: 'Any Game'
   });
@@ -949,15 +1067,19 @@ this.StatsVersusController = function($rootScope, $filter, users, games, EventSe
     });
     return list;
   };
-  vm.fight = function(player1, player2) {
-    return EventService.query({
-      query: {
-        "matches.players.name": {
-          $all: [player1, player2]
-        }
-      }
-    }).then(function(response) {
-      return console.log(response);
+  vm.fight = function(player1, player2, game) {
+    if (game === 'Any Game' || angular.isUndefined(game)) {
+      game = null;
+    }
+    return StatsService.versus(player1, player2, game).then(function(response) {
+      vm.gameLabels = [];
+      vm.gameCount = [];
+      vm.p1.ratio = [response[player1].wins, response[player1].loss, response[player1].draws];
+      vm.p2.ratio = [response[player2].wins, response[player2].loss, response[player2].draws];
+      return angular.forEach(response.games, function(count, game) {
+        vm.gameLabels.push(game);
+        return vm.gameCount.push(count);
+      });
     });
   };
   return vm;
@@ -1017,7 +1139,7 @@ ProfileController.resolve = {
   }
 };
 
-this.UserController = function($filter, userList, UserService) {
+this.UserController = function($filter, userList, UserService, ToasterService) {
   var remove, save, vm;
   vm = this;
   vm.users = userList.data;
@@ -1030,13 +1152,16 @@ this.UserController = function($filter, userList, UserService) {
     if (existing.length === 0) {
       return UserService.insert(user).then(function(result) {
         if (result.status) {
-          return vm.users.push(result.data);
+          vm.users.push(result.data);
         }
+        return ToasterService.info("User created!");
       });
     } else {
       return UserService.update({
         _id: user._id,
         doc: user
+      }).then(function(response) {
+        return ToasterService.info("User updated!");
       });
     }
   };
@@ -1138,7 +1263,7 @@ this.WishServiceWrapper = function(BaseService) {
   return new WishService('wishe');
 };
 
-this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate', 'ui.bootstrap', 'toaster', 'LocalStorageModule', 'ngFileUpload']).directive('back', HistoryBack).filter('range', RangeFilter).filter('games', GamesFilter).factory('Utility', Utility).factory('AuthService', AuthServiceWrapper).factory('EventService', EventServiceWrapper).factory('GamesService', GamesServiceWrapper).factory('WishService', WishServiceWrapper).factory('UserService', UserServiceWrapper).factory('BaseService', BaseServiceWrapper).controller('ApplicationController', ApplicationController).controller('AuthController', AuthController).controller('GameGameController', GameGameController).controller('GamesController', GamesController).controller('UserController', UserController).controller('EventController', EventController).controller('EventListController', EventListController).controller('CreateEventController', CreateEventController).controller('NavigationController', NavigationController).controller('WishListController', WishListController).controller('CreateWishController', CreateWishController).controller('ProfileController', ProfileController).controller('StatsVersusController', StatsVersusController).config(function($routeProvider) {
+this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate', 'ui.bootstrap', 'toaster', 'LocalStorageModule', 'ngFileUpload', 'chart.js']).directive('back', HistoryBack).filter('range', RangeFilter).filter('games', GamesFilter).factory('Utility', Utility).factory('ToasterService', ToasterService).factory('AuthService', AuthServiceWrapper).factory('EventService', EventServiceWrapper).factory('GamesService', GamesServiceWrapper).factory('WishService', WishServiceWrapper).factory('UserService', UserServiceWrapper).factory('StatsService', StatsServiceWrapper).factory('BaseService', BaseServiceWrapper).controller('ApplicationController', ApplicationController).controller('AuthController', AuthController).controller('GameGameController', GameGameController).controller('GamesController', GamesController).controller('UserController', UserController).controller('EventController', EventController).controller('EventListController', EventListController).controller('CreateEventController', CreateEventController).controller('NavigationController', NavigationController).controller('WishListController', WishListController).controller('CreateWishController', CreateWishController).controller('ProfileController', ProfileController).controller('StatsVersusController', StatsVersusController).config(function($routeProvider) {
   $routeProvider.when('/gamegame', {
     templateUrl: 'src/modules/games/gamegame.html',
     controller: 'GameGameController',

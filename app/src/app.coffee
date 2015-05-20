@@ -1,13 +1,15 @@
-@app = angular.module('matchtracker',['ngRoute','ngResource','ngAnimate','ui.bootstrap','toaster','LocalStorageModule','ngFileUpload'])
+@app = angular.module('matchtracker',['ngRoute','ngResource','ngAnimate','ui.bootstrap','toaster','LocalStorageModule','ngFileUpload','chart.js'])
   .directive 'back', HistoryBack
   .filter 'range', RangeFilter
   .filter 'games', GamesFilter
   .factory('Utility',Utility)
+  .factory('ToasterService',ToasterService)
   .factory('AuthService',AuthServiceWrapper)
   .factory('EventService',EventServiceWrapper)
   .factory('GamesService',GamesServiceWrapper)
   .factory('WishService',WishServiceWrapper)
   .factory('UserService',UserServiceWrapper)
+  .factory('StatsService',StatsServiceWrapper)
   .factory('BaseService',BaseServiceWrapper)
   .controller('ApplicationController',ApplicationController)
   .controller('AuthController',AuthController)
