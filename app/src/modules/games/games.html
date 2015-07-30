@@ -19,7 +19,7 @@
                                 <td ng-click="vm.newGame = game">{{ game._id }}</td>
                                 <td>{{ game.min_players }} - {{ game.max_players }}</td>
                                 <td>{{ game.duration }}</td>
-                                <td><img ng-src="{{ game.image_url }}" width="25" height="25" class="img-circle shadow" enlarge="" />  </td>
+                                <td><img ng-src="{{ game.images[0] }}" width="25" height="25" class="img-circle shadow" enlarge="" />  </td>
                                 <td>
                                     <a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeGame(game)"></span> </a>
                                     <a class="btn btn-xs btn-primary pull-right" style="margin-right: 10px"><span class="glyphicon glyphicon-edit" ng-click="vm.edit(game)"></span> </a>
@@ -44,7 +44,7 @@
                             <input ng-model="vm.newGame._id" id="name" name="name" type="text" placeholder="" class="form-control input-md" required="">
                         </div>
 
-                        <label class="control-label" for="est_duration">Duration</label>
+                        <label class="control-label" for="est_duration">Duration effect</label>
                             <div>
                                 <select name="est_duration" id="est_duration" class="form-control input-md" ng-model="vm.newGame.duration" ng-init="vm.durationOptions[0]" ng-options="item.key as item.text for item in vm.durationOptions"></select>
                             </div>
@@ -69,7 +69,6 @@
                         <label class="control-label">Image</label>
                         <div ngf-drop="" ngf-select="" ng-model="vm.files" ng-change="vm.upload(vm.files)" ngf-drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}" class="drop-box" ngf-multiple="true" ngf-allow-dir="true" ngf-accept="'image/*'" ngf-drop-available="true">
                             <div class="drag-drop-files">Click to select</div>
-                            <img ng-hide="!vm.newGame.image_url" ng-src="{{ vm.newGame.image_url }}" width="100" height="100" class="img-circle"/>
                         </div>
                         <div ng-show="vm.newGame.images.length">
                             <label class="control-label">Selected Images</label>

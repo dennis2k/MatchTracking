@@ -60,7 +60,8 @@
                         <fieldset>
                             <label class="control-label" for="game">Game</label>
                             <div>
-                                <input ng-model="vm.match.game" id="game" name="game" type="text" placeholder="" typeahead="game._id for game in vm.getGames($viewValue)" class="form-control input-md">
+                                <select ng-model="vm.match.game" id="game" name="game" ng-options="game._id as game._id for game in vm.games"  class="form-control input-md" ng-change="vm.loadMatchGame(vm.match.game)" required=""></select>
+                                <!--<input ng-model="vm.match.game" id="game" name="game" type="text" placeholder="" typeahead="game._id for game in vm.getGames($viewValue)">-->
                             </div>
                             <label class="control-label" for="report">Match report</label>
                             <div>
@@ -82,7 +83,7 @@
                                 <label class="control-label">Selected Images</label>
                                 <div>
                                         <span class="img-frame" ng-repeat="img in vm.match.images">
-                                            <img ng-src="{{ img }}" class="img-frame"/>
+                                            <img ng-src="{{ img }}" class="img-frame" style="max-width: 400px; max-height: 400px;"/>
                                         </span>
                                 </div>
                             </div>
@@ -100,8 +101,8 @@
                         </tr>
                         <tr ng-repeat="player in vm.match.players | orderBy : 'rank'">
                             <td>{{ player.name }}</td>
-                            <td><select ng-model="player.rank" class="form-control inline-small" ng-options="n for n in [] | range:vm.currentEvent.players.length" ng-disabled="player.is_not_participating" ></select></td>
-                            <td><input type="checkbox" ng-model="player.is_not_participating" ng-checked="player.is_not_participating" ng-click="player.is_not_participating ? player.rank = '' : player.rank = $index+1"></td>
+                            <td><select ng-model="player.rank" class="form-control inline-small" ng-options="n for n in [] | range:vm.currentEvent.players.length" ng-disabled="player.is_not_participating" required="" ></select></td>
+                            <td><input type="checkbox" ng-model="player.is_not_participating" ng-checked="player.is_not_participating"></td>
                         </tr>
                     </table>
                     <button class="btn btn-primary" ng-click="vm.addMatch(vm.match)">Add match</button>
@@ -120,12 +121,9 @@
                             <a ng-show="vm.root.edit" class="btn btn-xs btn-info pull-right pad">
                                 <span class="glyphicon glyphicon-backward" ng-click="vm.revertMatch(match)"></span>
                             </a>
-                            <a class="btn btn-xs btn-info pull-right pad">
-                                <span class="glyphicon glyphicon-minus" data-toggle="collapse" href="#match_{{ $index }}" aria-expanded="false" aria-controls="match_{{ $index }}"></span>
-                            </a>
                         </h3>
                     </div>
-                    <div class="panel-body collapse" id="match_{{ $index }}" aria-labelledby="match_{{ $index }}" >
+                    <div class="panel-body" id="match_{{ $index }}" aria-labelledby="match_{{ $index }}" >
                         <div class="row">
                             <div class="col-md-2">
                                 <img ng-src="{{ vm.getGameImage(match.game) }}" width="100" height="100" class="img-circle shadow" />
@@ -159,14 +157,20 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Player</th>
-                                        <th>New Rating</th>
-                                        <th>Old Rating</th>
+                                        <th>New rating</th>
+                                        <th>Old rating</th>
+                                        <th>BA</th>
+                                        <th>RE</th>
+                                        <th>DE</th>
                                     </tr>
                                     <tr ng-class="{ 'success' : $index == 0 }" ng-repeat="player in match.players | orderBy:'rank'">
                                         <td>{{ player.rank }}</td>
                                         <td>{{ player.name }}</td>
                                         <td>{{ player.new_rating }} ({{ player.adjustment }})<img ng-src="{{ player.new_rating > player.rating ? 'asserts/img/green-arrow.png' : 'asserts/img/arrow-red.png' }}" height="10" class="pull-right" style="margin-right: 50%" /></td>
                                         <td>{{ player.rating }}</td>
+                                        <td>{{ player.base_adjustment }}</td>
+                                        <td>{{ player.randomEffect }}</td>
+                                        <td>{{ player.durationEffect }}</td>
                                     </tr>
                                 </table>
                             </div>

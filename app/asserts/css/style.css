@@ -83,7 +83,7 @@
   transform: rotate(-10deg);
   color: red;
   text-shadow: 3px 3px 4px #969696;
-  z-index: 10000;
+  z-index: 1000;
   font-size: 2em;
   position: absolute;
   top: 40%;

@@ -350,8 +350,11 @@ this.EloCalculator = (function() {
 
   EloCalculator.prototype.players = {};
 
-  function EloCalculator(players) {
+  EloCalculator.prototype.game = {};
+
+  function EloCalculator(players, game) {
     this.players = players;
+    this.game = game;
   }
 
   EloCalculator.prototype.getKValue = function(player) {
@@ -380,11 +383,13 @@ this.EloCalculator = (function() {
   };
 
   EloCalculator.prototype.calculateNewRating = function() {
-    var i, j, len, len1, opp, player, ref, ref1, subMatch;
+    var durationEffect, i, j, len, len1, opp, player, randomEffect, ref, ref1, subMatch;
     ref = this.players;
     for (i = 0, len = ref.length; i < len; i++) {
       player = ref[i];
       subMatch = 0;
+      randomEffect = 0;
+      durationEffect = 0;
       ref1 = this.players;
       for (j = 0, len1 = ref1.length; j < len1; j++) {
         opp = ref1[j];
@@ -394,8 +399,19 @@ this.EloCalculator = (function() {
         }
       }
       console.log("Adjustment for player: " + player.name + " -  " + subMatch);
-      player.new_rating = Math.round((player.rating + subMatch) * 100) / 100;
+      player.base_adjustment = Math.round(subMatch * 100) / 100;
+      if (angular.isDefined(this.game.random_factor)) {
+        randomEffect = player.base_adjustment * parseFloat(this.game.random_factor);
+        subMatch += randomEffect;
+      }
+      if (angular.isDefined(this.game.duration)) {
+        durationEffect = player.base_adjustment * parseFloat(this.game.duration);
+        subMatch += durationEffect;
+      }
+      player.new_rating = Math.round((player.rating + (Math.round(subMatch * 100) / 100)) * 100) / 100;
       player.adjustment = Math.round(subMatch * 100) / 100;
+      player.randomEffect = Math.round(randomEffect * 100) / 100;
+      player.durationEffect = Math.round(durationEffect * 100) / 100;
     }
     return this.player;
   };
@@ -415,6 +431,10 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
   };
   vm.root = $rootScope;
   vm.now = new Date().getTime();
+  vm.matchGame = {};
+  angular.forEach(vm.currentEvent.players, function(player) {
+    return player.is_not_participating = true;
+  });
   vm.selectEvent = function(event) {
     return $location.path('/event/' + event.name);
   };
@@ -437,6 +457,11 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
       }
     });
   };
+  vm.loadMatchGame = function(game) {
+    return GamesService.findGamesByName(game).then(function(response) {
+      return vm.matchGame = response.data[0];
+    });
+  };
   vm.addPlayerToMatch = function(player) {
     var filteredArray, matchPlayer;
     if (vm.match.players == null) {
@@ -456,8 +481,11 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
   };
   vm.addMatch = function(match) {
     var filteredPlayers, m;
+    if (angular.isUndefined(match.game)) {
+      return false;
+    }
     filteredPlayers = $filter('filter')(match.players, function(player) {
-      if (player.rank === '') {
+      if (player.rank === '' || angular.isUndefined(player.rank)) {
         return false;
       }
       if (player.is_not_participating) {
@@ -465,19 +493,19 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
       }
       return true;
     });
-    if (filteredPlayers.length === 0) {
-      toaster.pop('warning', "Warning!", "No players selected for match");
+    if (filteredPlayers.length < 2) {
+      return toaster.pop('warning', "Warning!", "At least 2 players must be added to a match");
     }
     match.players = filteredPlayers;
-    m = new EloCalculator(match.players);
+    m = new EloCalculator(match.players, vm.matchGame);
     m.calculateNewRating();
     return EventService.addMatch(vm.currentEvent._id.$id, match).then(function(result) {
       var eventPlayer, filteredArray, i, len, player, ref;
       ref = match.players;
       for (i = 0, len = ref.length; i < len; i++) {
         player = ref[i];
-        filteredArray = $filter('filter')(vm.currentEvent.players, {
-          name: player.name
+        filteredArray = $filter('filter')(vm.currentEvent.players, function(ePlayer) {
+          return player.name === ePlayer.name;
         });
         eventPlayer = filteredArray.pop();
         eventPlayer.rating = player.new_rating;
@@ -489,6 +517,9 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
       vm.match = {
         players: vm.currentEvent.players
       };
+      angular.forEach(vm.currentEvent.players, function(player) {
+        return player.is_not_participating = true;
+      });
       return toaster.pop('info', "Info", "Match was added !");
     });
   };
@@ -800,35 +831,143 @@ this.GamesController = function($filter, $scope, GamesService, gameList, Utility
   vm.mode = 'list';
   vm.durationOptions = [
     {
-      key: 0,
-      text: 'Freenzy (5 - 15 min)'
+      key: "0.1",
+      text: '0.1 - Super ultra hyper frenzy'
     }, {
-      key: 1,
-      text: 'Lets get it awn! (15 - 60 min)'
+      key: "0.2",
+      text: '0.2'
     }, {
-      key: 2,
-      text: 'Cum awn!(1 - 2 hours)'
+      key: '0.3',
+      text: '0.3'
     }, {
-      key: 3,
-      text: 'Jesus! (2 - 4 hours)'
+      key: '0.4',
+      text: '0.4'
     }, {
-      key: 4,
-      text: 'Sn00zey (4 hours+)'
+      key: '0.5',
+      text: '0.5'
+    }, {
+      key: '0.6',
+      text: '0.6'
+    }, {
+      key: '0.7',
+      text: '0.7'
+    }, {
+      key: '0.8',
+      text: '0.8'
+    }, {
+      key: '0.9',
+      text: '0.9'
+    }, {
+      key: '1.0',
+      text: '1.0 - Regular'
+    }, {
+      key: '1.1',
+      text: '1.1'
+    }, {
+      key: '1.2',
+      text: '1.2'
+    }, {
+      key: '1.3',
+      text: '1.3'
+    }, {
+      key: '1.4',
+      text: '1.4'
+    }, {
+      key: '1.5',
+      text: '1.5'
+    }, {
+      key: '1.6',
+      text: '1.6'
+    }, {
+      key: '1.7',
+      text: '1.7'
+    }, {
+      key: '1.8',
+      text: '1.8'
+    }, {
+      key: '1.9',
+      text: '1.9'
+    }, {
+      key: '2.0',
+      text: '2.0'
+    }, {
+      key: '2.1',
+      text: '2.1'
+    }, {
+      key: '2.2',
+      text: '2.2'
+    }, {
+      key: '2.3',
+      text: '2.3'
+    }, {
+      key: '2.4',
+      text: '2.4'
+    }, {
+      key: '2.5',
+      text: '2.5 - Twillight'
     }
   ];
   vm.skillFactorOptions = [
     {
-      key: 0,
-      text: 'So much Random'
+      key: "0.1",
+      text: '0.1 - Pure random'
     }, {
-      key: 1,
-      text: 'Random'
+      key: "0.2",
+      text: '0.2'
     }, {
-      key: 2,
-      text: 'Skill game with a twist of ransom !'
+      key: '0.3',
+      text: '0.3'
     }, {
-      key: 3,
-      text: 'Pure skillaz'
+      key: '0.4',
+      text: '0.4'
+    }, {
+      key: '0.5',
+      text: '0.5'
+    }, {
+      key: '0.6',
+      text: '0.6'
+    }, {
+      key: '0.7',
+      text: '0.7'
+    }, {
+      key: '0.8',
+      text: '0.8'
+    }, {
+      key: '0.9',
+      text: '0.9'
+    }, {
+      key: '1.0',
+      text: '1.0 - Half skill, half random'
+    }, {
+      key: '1.1',
+      text: '1.1'
+    }, {
+      key: '1.2',
+      text: '1.2'
+    }, {
+      key: '1.3',
+      text: '1.3'
+    }, {
+      key: '1.4',
+      text: '1.4'
+    }, {
+      key: '1.5',
+      text: '1.5'
+    }, {
+      key: '1.6',
+      text: '1.6'
+    }, {
+      key: '1.7',
+      text: '1.7'
+    }, {
+      key: '1.8',
+      text: '1.8'
+    }, {
+      key: '1.9',
+      text: '1.9'
+    }, {
+      key: '2.0',
+      text: '2.0 - Pure mad skillaz'
     }
   ];
   saveGame = function(game) {
@@ -945,9 +1084,7 @@ this.GamesServiceWrapper = function(BaseService) {
 
     GamesService.prototype.findGamesByName = function(name) {
       return this.query({
-        doc: {
-          _id: name
-        }
+        _id: name
       });
     };
 

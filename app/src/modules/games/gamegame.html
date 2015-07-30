@@ -26,7 +26,7 @@
             <div class="col-md-12">
                 <h4>Playable games</h4>
                 <span ng-repeat="game in vm.playableGames" class="img-frame" ng-click="vm.selectGame(game)">
-                    <img ng-src="{{ game.image_url }}" title="{{ game._id }}" width="150" height="150"  />
+                    <img ng-src="{{ game.images[0] }}" title="{{ game._id }}" width="150" height="150"  />
                 </span>
             </div>
         </div>
@@ -37,7 +37,7 @@
                     <button class="btn btn-primary" ng-disabled="vm.selectedGames < 3" ng-click="vm.play()">Play</button>
                 </div>
                 <span ng-repeat="game in vm.selectedGames track by $index" class="img-frame" ng-click="vm.unselectGame(game)" >
-                    <img ng-src="{{ game.image_url }}" title="{{ game._id }}" width="75" height="75"  />
+                    <img ng-src="{{ game.images[0] }}" title="{{ game._id }}" width="75" height="75"  />
                 </span>
 
             </div>
@@ -46,7 +46,7 @@
     <div class="row" ng-show="vm.states.playing">
         <div class="col-md-10">
             <span ng-repeat="game in vm.selectedGames track by $index" class="img-frame delay" ng-class="game.vanish ? 'vanish' : ''" >
-                <img ng-src="{{ game.image_url }}" title="{{ game._id }}" width="150" height="150"  />
+                <img ng-src="{{ game.images[0] }}" title="{{ game._id }}" width="150" height="150"  />
             </span>
         </div>
     </div>

@@ -6,6 +6,11 @@
   vm.match = { players : vm.currentEvent.players }
   vm.root = $rootScope;
   vm.now = new Date().getTime()
+  vm.matchGame = {}
+
+  angular.forEach(vm.currentEvent.players,(player) ->
+    player.is_not_participating = true
+   )
 
   vm.selectEvent = (event) ->
     $location.path('/event/' + event.name)
@@ -26,6 +31,11 @@
       vm.currentEvent = result.data if result.status
     )
 
+  vm.loadMatchGame = (game) ->
+    GamesService.findGamesByName(game).then((response) ->
+      vm.matchGame = response.data[0]
+    )
+
   # Adds a player to a match
   vm.addPlayerToMatch = (player) ->
     vm.match.players = [] if !vm.match.players?
@@ -41,22 +51,27 @@
 
   # Adds a match to the event
   vm.addMatch = (match) ->
+    if(angular.isUndefined(match.game))
+      return false
+
     filteredPlayers = $filter('filter')(match.players,(player) ->
-      if player.rank == ''
+      if player.rank == '' || angular.isUndefined(player.rank)
         return false
       if player.is_not_participating
         return false
       return true
     )
-    if(filteredPlayers.length == 0)
-      toaster.pop('warning',"Warning!","No players selected for match")
+    if(filteredPlayers.length < 2)
+      return toaster.pop('warning',"Warning!","At least 2 players must be added to a match")
 
     match.players = filteredPlayers
-    m = new EloCalculator(match.players)
+    m = new EloCalculator(match.players,vm.matchGame)
     m.calculateNewRating();
     EventService.addMatch(vm.currentEvent._id.$id,match).then((result) ->
       for player in match.players
-        filteredArray = $filter('filter')(vm.currentEvent.players,{name : player.name})
+        filteredArray = $filter('filter')(vm.currentEvent.players,(ePlayer) ->
+          player.name == ePlayer.name
+        )
         eventPlayer = filteredArray.pop()
         eventPlayer.rating = player.new_rating
         delete eventPlayer.rank
@@ -64,6 +79,9 @@
       EventService.updatePlayerRating(vm.currentEvent._id.$id,vm.currentEvent.players)
       vm.currentEvent.matches = result.data.matches
       vm.match = {players : vm.currentEvent.players};
+      angular.forEach(vm.currentEvent.players,(player) ->
+        player.is_not_participating = true
+      )
       toaster.pop('info',"Info","Match was added !")
     )
   # Removes a match from an event

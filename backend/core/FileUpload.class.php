@@ -1,4 +1,6 @@
 <?php
+ini_set('upload_max_filesize','40M');
+ini_set('post_max_size ','40M');
 class FileUpload   {
 
     private $name, $type, $tmp_name, $error, $size, $path, $context;
