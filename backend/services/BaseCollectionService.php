@@ -72,8 +72,6 @@ class BaseCollectionService {
 
     public function insert($doc)
     {
-        if(!isset($doc['_id']))
-            $doc['_id'] = null;
         $id = ($this->generatedId) ? $this->getGeneratedMongoID($doc) : $doc['_id'];
         $existing = $this->collection->findOne(array('_id' => $id));
         if(!empty($existing))
