@@ -74,12 +74,21 @@ class BaseCollectionService {
     {
         if(!isset($doc['_id']))
             $doc['_id'] = null;
-        $id = ($this->generatedId) ? new MongoId($doc['_id']) : $doc['_id'];
+        $id = ($this->generatedId) ? $this->getGeneratedMongoID($doc) : $doc['_id'];
         $existing = $this->collection->findOne(array('_id' => $id));
         if(!empty($existing))
             throw new Exception("Duplicate entry!");
         $this->collection->insert($doc);
         return $doc;
+    }
+
+    public function getGeneratedMongoID($doc){
+        if($this->generatedId) {
+            if(!isset($doc['_id']))
+                return new MongoId();
+            else
+                return new MongoId($doc['_id']);
+            }
     }
 
     public function applyRules(&$query)
