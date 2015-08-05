@@ -402,11 +402,6 @@ this.EloCalculator = (function() {
       player.base_adjustment = Math.round(subMatch * 100) / 100;
       if (angular.isDefined(this.game.random_factor)) {
         randomEffect = player.base_adjustment * parseFloat(this.game.random_factor);
-        if (this.game.random_factor < 1) {
-          randomEffect *= -1;
-        } else {
-          randomEffect -= player.base_adjustment;
-        }
         subMatch += randomEffect;
       }
       player.new_rating = Math.round((player.rating + (Math.round(subMatch * 100) / 100)) * 100) / 100;
@@ -828,8 +823,38 @@ this.GamesController = function($filter, $scope, GamesService, gameList, Utility
   vm.mode = 'list';
   vm.skillFactorOptions = [
     {
+      key: -0.9,
+      text: '-0.9 - Pure random'
+    }, {
+      key: -0.8,
+      text: '-0.8'
+    }, {
+      key: -0.7,
+      text: '-0.7'
+    }, {
+      key: -0.6,
+      text: '-0.6'
+    }, {
+      key: -0.5,
+      text: '-0.5'
+    }, {
+      key: -0.4,
+      text: '-0.4'
+    }, {
+      key: -0.3,
+      text: '-0.3'
+    }, {
+      key: -0.2,
+      text: '-0.2'
+    }, {
+      key: -0.1,
+      text: '-0.1'
+    }, {
+      key: 0.0,
+      text: '0.0 - Regular'
+    }, {
       key: 0.1,
-      text: '0.1 Pure random'
+      text: '0.1'
     }, {
       key: 0.2,
       text: '0.2'
@@ -853,37 +878,7 @@ this.GamesController = function($filter, $scope, GamesService, gameList, Utility
       text: '0.8'
     }, {
       key: 0.9,
-      text: '0.9'
-    }, {
-      key: 1.0,
-      text: '1.0 - Regular'
-    }, {
-      key: 1.1,
-      text: '1.1'
-    }, {
-      key: 1.2,
-      text: '1.2'
-    }, {
-      key: 1.3,
-      text: '1.3'
-    }, {
-      key: 1.4,
-      text: '1.4'
-    }, {
-      key: 1.5,
-      text: '1.5'
-    }, {
-      key: 1.6,
-      text: '1.6'
-    }, {
-      key: 1.7,
-      text: '1.7'
-    }, {
-      key: 1.8,
-      text: '1.8'
-    }, {
-      key: 1.9,
-      text: '1.9 Pure mad skillaz'
+      text: '0.9 - Mad skills'
     }
   ];
   saveGame = function(game) {

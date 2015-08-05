@@ -5,7 +5,17 @@
   vm.newGame = {}
   vm.mode = 'list'
   vm.skillFactorOptions = [
-    {key : 0.1, text : '0.1 Pure random'},
+    {key : -0.9, text : '-0.9 - Pure random'},
+    {key : -0.8, text : '-0.8'},
+    {key : -0.7, text : '-0.7'},
+    {key : -0.6, text : '-0.6'},
+    {key : -0.5, text : '-0.5'},
+    {key : -0.4, text : '-0.4'},
+    {key : -0.3, text : '-0.3'},
+    {key : -0.2, text : '-0.2'},
+    {key : -0.1, text : '-0.1'},
+    {key : 0.0, text : '0.0 - Regular'}
+    {key : 0.1, text : '0.1'},
     {key : 0.2, text : '0.2'},
     {key : 0.3, text : '0.3'},
     {key : 0.4, text : '0.4'},
@@ -13,17 +23,7 @@
     {key : 0.6, text : '0.6'},
     {key : 0.7, text : '0.7'},
     {key : 0.8, text : '0.8'},
-    {key : 0.9, text : '0.9'},
-    {key : 1.0, text : '1.0 - Regular'},
-    {key : 1.1, text : '1.1'},
-    {key : 1.2, text : '1.2'},
-    {key : 1.3, text : '1.3'},
-    {key : 1.4, text : '1.4'},
-    {key : 1.5, text : '1.5'},
-    {key : 1.6, text : '1.6'},
-    {key : 1.7, text : '1.7'},
-    {key : 1.8, text : '1.8'},
-    {key : 1.9, text : '1.9 Pure mad skillaz'}
+    {key : 0.9, text : '0.9 - Mad skills'},
   ]
 
 

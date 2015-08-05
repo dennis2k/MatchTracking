@@ -37,10 +37,6 @@ class @EloCalculator
       #Apply random
       if(angular.isDefined(@game.random_factor))
         randomEffect = (player.base_adjustment * parseFloat(@game.random_factor))
-        if(@game.random_factor < 1)
-          randomEffect *= -1
-        else
-          randomEffect -= player.base_adjustment
         subMatch += randomEffect
 
       player.new_rating = Math.round((player.rating + (Math.round(subMatch*100)/100)) * 100) / 100
