@@ -402,11 +402,12 @@ this.EloCalculator = (function() {
       player.base_adjustment = Math.round(subMatch * 100) / 100;
       if (angular.isDefined(this.game.random_factor)) {
         randomEffect = player.base_adjustment * parseFloat(this.game.random_factor);
+        if (this.game.random_factor < 1) {
+          randomEffect *= -1;
+        } else {
+          randomEffect -= player.base_adjustment;
+        }
         subMatch += randomEffect;
-      }
-      if (angular.isDefined(this.game.duration)) {
-        durationEffect = player.base_adjustment * parseFloat(this.game.duration);
-        subMatch += durationEffect;
       }
       player.new_rating = Math.round((player.rating + (Math.round(subMatch * 100) / 100)) * 100) / 100;
       player.adjustment = Math.round(subMatch * 100) / 100;
@@ -526,8 +527,9 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
   vm.removeMatch = function(match) {
     return EventService.removeMatch(vm.currentEvent._id.$id, match.uid).then(function(result) {
       if (result.status) {
-        return vm.currentEvent = result.data;
+        vm.currentEvent = result.data;
       }
+      return toaster.pop('info', "Info", "Match removed!");
     });
   };
   vm.revertMatch = function(match) {
@@ -537,12 +539,11 @@ this.EventController = function(event, $rootScope, $filter, $scope, $location, t
         name: player.name
       });
       eventPlayer = eventPlayer.pop();
-      console.log(player);
-      console.log(eventPlayer);
       return eventPlayer.rating = player.rating;
     });
     return EventService.updatePlayerRating(vm.currentEvent._id.$id, vm.currentEvent.players).then(function() {
-      return removeMatch(match);
+      vm.removeMatch(match);
+      return toaster.pop('info', "Info", "Match reverted!!");
     });
   };
   vm.getGames = function(input) {
@@ -654,11 +655,7 @@ this.EventListController = function($location, EventService, eventList) {
 EventListController.resolve = {
   eventList: function(EventService, $rootScope) {
     if (angular.isDefined($rootScope.user)) {
-      return EventService.query({
-        query: {
-          "players.name": $rootScope.user._id
-        }
-      });
+      return EventService.query();
     }
   }
 };
@@ -823,159 +820,80 @@ GameGameController.resolve = {
   }
 };
 
-this.GamesController = function($filter, $scope, GamesService, gameList, Utility) {
-  var add, edit, removeGame, saveGame, vm;
+this.GamesController = function($filter, $scope, GamesService, gameList, Utility, toaster) {
+  var add, edit, removeGame, removeImg, saveGame, vm;
   vm = this;
   vm.games = gameList.data;
   vm.newGame = {};
   vm.mode = 'list';
-  vm.durationOptions = [
-    {
-      key: "0.1",
-      text: '0.1 - Super ultra hyper frenzy'
-    }, {
-      key: "0.2",
-      text: '0.2'
-    }, {
-      key: '0.3',
-      text: '0.3'
-    }, {
-      key: '0.4',
-      text: '0.4'
-    }, {
-      key: '0.5',
-      text: '0.5'
-    }, {
-      key: '0.6',
-      text: '0.6'
-    }, {
-      key: '0.7',
-      text: '0.7'
-    }, {
-      key: '0.8',
-      text: '0.8'
-    }, {
-      key: '0.9',
-      text: '0.9'
-    }, {
-      key: '1.0',
-      text: '1.0 - Regular'
-    }, {
-      key: '1.1',
-      text: '1.1'
-    }, {
-      key: '1.2',
-      text: '1.2'
-    }, {
-      key: '1.3',
-      text: '1.3'
-    }, {
-      key: '1.4',
-      text: '1.4'
-    }, {
-      key: '1.5',
-      text: '1.5'
-    }, {
-      key: '1.6',
-      text: '1.6'
-    }, {
-      key: '1.7',
-      text: '1.7'
-    }, {
-      key: '1.8',
-      text: '1.8'
-    }, {
-      key: '1.9',
-      text: '1.9'
-    }, {
-      key: '2.0',
-      text: '2.0'
-    }, {
-      key: '2.1',
-      text: '2.1'
-    }, {
-      key: '2.2',
-      text: '2.2'
-    }, {
-      key: '2.3',
-      text: '2.3'
-    }, {
-      key: '2.4',
-      text: '2.4'
-    }, {
-      key: '2.5',
-      text: '2.5 - Twillight'
-    }
-  ];
   vm.skillFactorOptions = [
     {
-      key: "0.1",
-      text: '0.1 - Pure random'
+      key: 0.1,
+      text: '0.1 Pure random'
     }, {
-      key: "0.2",
+      key: 0.2,
       text: '0.2'
     }, {
-      key: '0.3',
+      key: 0.3,
       text: '0.3'
     }, {
-      key: '0.4',
+      key: 0.4,
       text: '0.4'
     }, {
-      key: '0.5',
+      key: 0.5,
       text: '0.5'
     }, {
-      key: '0.6',
+      key: 0.6,
       text: '0.6'
     }, {
-      key: '0.7',
+      key: 0.7,
       text: '0.7'
     }, {
-      key: '0.8',
+      key: 0.8,
       text: '0.8'
     }, {
-      key: '0.9',
+      key: 0.9,
       text: '0.9'
     }, {
-      key: '1.0',
-      text: '1.0 - Half skill, half random'
+      key: 1.0,
+      text: '1.0 - Regular'
     }, {
-      key: '1.1',
+      key: 1.1,
       text: '1.1'
     }, {
-      key: '1.2',
+      key: 1.2,
       text: '1.2'
     }, {
-      key: '1.3',
+      key: 1.3,
       text: '1.3'
     }, {
-      key: '1.4',
+      key: 1.4,
       text: '1.4'
     }, {
-      key: '1.5',
+      key: 1.5,
       text: '1.5'
     }, {
-      key: '1.6',
+      key: 1.6,
       text: '1.6'
     }, {
-      key: '1.7',
+      key: 1.7,
       text: '1.7'
     }, {
-      key: '1.8',
+      key: 1.8,
       text: '1.8'
     }, {
-      key: '1.9',
-      text: '1.9'
-    }, {
-      key: '2.0',
-      text: '2.0 - Pure mad skillaz'
+      key: 1.9,
+      text: '1.9 Pure mad skillaz'
     }
   ];
   saveGame = function(game) {
     if (angular.isUndefined(game._id)) {
       return GamesService.insert(game).then(function(result) {
         if (result.status) {
-          return vm.games.push(result.data);
+          vm.games.push(result.data);
         }
+        toaster.pop('info', "Info", "Game created!");
+        return vm.mode = 'list';
       });
     } else {
       return GamesService.update({
@@ -986,8 +904,9 @@ this.GamesController = function($filter, $scope, GamesService, gameList, Utility
           if (response.status) {
             vm.games.push(response.data);
           }
-          return vm.mode = 'list';
         }
+        vm.mode = 'list';
+        return toaster.pop('info', "Info", "Game updated!");
       });
     }
   };
@@ -997,6 +916,13 @@ this.GamesController = function($filter, $scope, GamesService, gameList, Utility
       idx = vm.games.indexOf(game);
       return vm.games.splice(idx, 1);
     });
+  };
+  removeImg = function(img) {
+    var idx;
+    console.log("CLICK");
+    idx = vm.newGame.images.indexOf(img);
+    vm.newGame.images.splice(idx, 1);
+    return console.log(idx, img);
   };
   edit = function(game) {
     vm.mode = 'edit';
@@ -1038,6 +964,7 @@ this.GamesController = function($filter, $scope, GamesService, gameList, Utility
   vm.saveGame = saveGame;
   vm.removeGame = removeGame;
   vm.edit = edit;
+  vm.removeImg = removeImg;
   return vm;
 };
 
@@ -1472,6 +1399,6 @@ this.app = angular.module('matchtracker', ['ngRoute', 'ngResource', 'ngAnimate',
 }).config(function(localStorageServiceProvider) {
   return localStorageServiceProvider.setPrefix('matchtracker');
 }).run(function($rootScope, $location) {
-  $rootScope.edit = false;
+  $rootScope.edit = true;
   return $rootScope.initPath = $location.path();
 });

@@ -11,4 +11,4 @@
 EventListController.resolve =
   eventList : (EventService,$rootScope) ->
     if(angular.isDefined($rootScope.user))
-      EventService.query({ query : { "players.name" : $rootScope.user._id } })
+      EventService.query()

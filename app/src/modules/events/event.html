@@ -115,11 +115,11 @@
                 <div class="panel panel-primary" ng-repeat="match in vm.currentEvent.matches | orderBy:'timestamp':true">
                     <div class="panel-heading">
                         <h3 class="panel-title">{{ match.game }}
-                            <a ng-show="vm.canEdit()" class="btn btn-xs btn-danger pull-right">
-                                <span class="glyphicon glyphicon-remove" ng-click="vm.removeMatch(match)"></span>
+                            <a ng-show="vm.canEdit()" class="btn btn-xs btn-danger pull-right" ng-click="vm.removeMatch(match)">
+                                <span class="glyphicon glyphicon-remove" ></span>
                             </a>
-                            <a ng-show="vm.root.edit" class="btn btn-xs btn-info pull-right pad">
-                                <span class="glyphicon glyphicon-backward" ng-click="vm.revertMatch(match)"></span>
+                            <a ng-show="vm.root.edit && !match.reverted" class="btn btn-xs btn-info pull-right pad" ng-click="vm.revertMatch(match)">
+                                <span class="glyphicon glyphicon-backward" ></span>
                             </a>
                         </h3>
                     </div>
@@ -159,18 +159,20 @@
                                         <th>Player</th>
                                         <th>New rating</th>
                                         <th>Old rating</th>
-                                        <th>BA</th>
-                                        <th>RE</th>
-                                        <th>DE</th>
+                                        <th>Base Adjustmnet</th>
+                                        <th>Skill Factor Effect</th>
+                                        <th></th>
                                     </tr>
                                     <tr ng-class="{ 'success' : $index == 0 }" ng-repeat="player in match.players | orderBy:'rank'">
                                         <td>{{ player.rank }}</td>
                                         <td>{{ player.name }}</td>
-                                        <td>{{ player.new_rating }} ({{ player.adjustment }})<img ng-src="{{ player.new_rating > player.rating ? 'asserts/img/green-arrow.png' : 'asserts/img/arrow-red.png' }}" height="10" class="pull-right" style="margin-right: 50%" /></td>
+                                        <td><img ng-src="{{ player.new_rating > player.rating ? 'asserts/img/green-arrow.png' : 'asserts/img/arrow-red.png' }}" height="10" />
+                                            {{ player.new_rating }}
+                                            ({{ player.adjustment }})
+                                        </td>
                                         <td>{{ player.rating }}</td>
                                         <td>{{ player.base_adjustment }}</td>
                                         <td>{{ player.randomEffect }}</td>
-                                        <td>{{ player.durationEffect }}</td>
                                     </tr>
                                 </table>
                             </div>

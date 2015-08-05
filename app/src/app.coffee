@@ -49,7 +49,7 @@
       .setPrefix('matchtracker')
   )
   .run(($rootScope,$location) ->
-    $rootScope.edit = false
+    $rootScope.edit = true
     $rootScope.initPath = $location.path()
 
   )

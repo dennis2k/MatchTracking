@@ -11,18 +11,18 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Players</th>
-                                <th>Duration</th>
+                                <th>Skill factor</th>
                                 <th>Image</th>
                                 <th></th>
                             </tr>
                             <tr ng-repeat="game in vm.games | orderBy : '_id'">
                                 <td ng-click="vm.newGame = game">{{ game._id }}</td>
                                 <td>{{ game.min_players }} - {{ game.max_players }}</td>
-                                <td>{{ game.duration }}</td>
+                                <td>{{ game.random_factor }}</td>
                                 <td><img ng-src="{{ game.images[0] }}" width="25" height="25" class="img-circle shadow" enlarge="" />  </td>
                                 <td>
-                                    <a class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ng-click="vm.removeGame(game)"></span> </a>
-                                    <a class="btn btn-xs btn-primary pull-right" style="margin-right: 10px"><span class="glyphicon glyphicon-edit" ng-click="vm.edit(game)"></span> </a>
+                                    <a ng-click="vm.removeGame(game)" class="btn btn-xs btn-danger pull-right"><span class="glyphicon glyphicon-remove" ></span> </a>
+                                    <a ng-click="vm.edit(game)" class="btn btn-xs btn-primary pull-right" style="margin-right: 10px"><span class="glyphicon glyphicon-edit" ></span> </a>
                                 </td>
                                 <td></td>
                             </tr>
@@ -44,16 +44,10 @@
                             <input ng-model="vm.newGame._id" id="name" name="name" type="text" placeholder="" class="form-control input-md" required="">
                         </div>
 
-                        <label class="control-label" for="est_duration">Duration effect</label>
-                            <div>
-                                <select name="est_duration" id="est_duration" class="form-control input-md" ng-model="vm.newGame.duration" ng-init="vm.durationOptions[0]" ng-options="item.key as item.text for item in vm.durationOptions"></select>
-                            </div>
-                        <span class="help-block">The duration is used in ELO calculation - short games, less impact</span>
-
-                        <label class="control-label" for="random">Random Factor</label>
+                        <label class="control-label" for="random">Skill factor</label>
                         <div>
-                            <select name="random" id="random" class="form-control input-md" ng-model="vm.newGame.random_factor" ng-init="vm.durationOptions[0]" ng-options="item.key as item.text for item in vm.skillFactorOptions"></select>
-                            <span class="help-block">The random factor is used in ELO calculation - more random, less impact</span>
+                            <select name="random" id="random" class="form-control input-md" ng-model="vm.newGame.random_factor" ng-init="vm.skillFactorOptions[0]" ng-options="item.key as item.text for item in vm.skillFactorOptions"></select>
+                            <span class="help-block">The skill factor is used in ELO calculation - more skill based, more impact</span>
                         </div>
 
                         <label class="control-label" for="min_players">Min. players</label>
@@ -73,9 +67,13 @@
                         <div ng-show="vm.newGame.images.length">
                             <label class="control-label">Selected Images</label>
                             <div>
-                                <span class="img-frame" ng-repeat="img in vm.newGame.images">
-                                    <img ng-src="{{ img }}" class="img-frame"/>
-                                </span>
+                                <div class="img-frame" ng-repeat="img in vm.newGame.images">
+
+                                    <div>
+                                        <img ng-src="{{ img }}" class="img-frame" style="max-height: 400px"/>
+                                        <i class="glyphicon glyphicon-remove" style="vertical-align: top; cursor: pointer; margin-top: -5px; margin-left: -10px; color: red;" ng-click="vm.removeImg(img)" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

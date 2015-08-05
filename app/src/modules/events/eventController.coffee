@@ -88,6 +88,7 @@
   vm.removeMatch = (match) ->
     EventService.removeMatch(vm.currentEvent._id.$id,match.uid).then((result) ->
       vm.currentEvent = result.data if result.status
+      toaster.pop('info',"Info","Match removed!")
     )
 
   #Roll back the points given to players paticipating in this game and delete the game
@@ -95,11 +96,10 @@
     angular.forEach match.players, (player) ->
       eventPlayer = $filter('filter')(vm.currentEvent.players,{name : player.name})
       eventPlayer = eventPlayer.pop()
-      console.log(player)
-      console.log(eventPlayer)
       eventPlayer.rating = player.rating
     EventService.updatePlayerRating(vm.currentEvent._id.$id,vm.currentEvent.players).then () ->
-      removeMatch(match)
+      vm.removeMatch(match)
+      toaster.pop('info',"Info","Match reverted!!")
 
   # Auto complete searching for games
   vm.getGames = (input) ->
