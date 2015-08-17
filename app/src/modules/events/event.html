@@ -9,8 +9,8 @@
         <h1>{{ vm.currentEvent.name }}
         </h1>
         <p>{{ vm.currentEvent.place }}</p>
-        <p>{{ vm.currentEvent.start | date : 'd MMM yyyy' }}</p>
-        <p>{{ vm.currentEvent.end | date : 'd MMM yyyy' }}</p>
+        <p>{{ vm.currentEvent.start_date | date : 'd MMM yyyy' }}</p>
+        <p>{{ vm.currentEvent.end_date | date : 'd MMM yyyy' }}</p>
     </div>
     <div class="col-lg-1">
         <button class="btn btn-danger" ng-click="vm.delete(vm.currentEvent)" ng-if="vm.canEdit"><span class="glyphicon glyphicon-remove"</button>
