@@ -12,6 +12,8 @@
 
     event.players = eventPlayers
     event.owner = $rootScope.user._id
+    event.start_date = convertDateToTime(event.start_date) / 1000
+    event.end_date = convertDateToTime(event.end_date) / 1000
     EventService.insert({event}).then((result) ->
       $location.path('/events');
     )
