@@ -1,4 +1,7 @@
-app/asserts/img
+app/asserts/img/event
+app/asserts/img/game
+app/asserts/img/match
+app/asserts/img/user
 app/bower_components
 app/node_modules
 app/asserts/dist/matchtracker.js
