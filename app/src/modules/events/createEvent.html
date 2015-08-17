@@ -17,12 +17,17 @@
                 </div>
 
                 <label for="start">Start</label>
-                <input id="start" type="date" class="form-control" ng-model="vm.event.start" required="true" />
-                <span class="help-block">First day of the event</span>
+                <datepicker ng-model="vm.event.start" min-date="vm.minDate" max-date="vm.event.end" show-weeks="true" class="well well-sm"></datepicker>
 
-                <label for="end">End</label>
+                <label for="start">End</label>
+                <datepicker ng-model="vm.event.end" min-date="vm.event.start" show-weeks="true" class="well well-sm"></datepicker>
+            <!--
+                <input id="start" type="date" class="form-control" ng-model="vm.event.start" required="true" />
+                <span class="help-block">First day of the event</span>-->
+
+                <!--<label for="end">End</label>
                 <input id="end" type="date" class="form-control" ng-model="vm.event.end" required="true" />
-                <span class="help-block">Last day of the event</span>
+                <span class="help-block">Last day of the event</span>-->
 
         </div>
         <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
