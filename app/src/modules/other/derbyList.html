@@ -30,7 +30,7 @@
                     <br />
                     <div class="panel panel-info" style="margin: 20px">
                         <div class="panel-heading">
-                            <strong>{{ comment.owner }}</strong> <span class="text-muted">{{ comment.create_time | date : 'MMM d, y HH:mm' }}</span>
+                            <strong>{{ comment.owner }}</strong> <span class="text-muted">{{ comment.create_time *1000 | date : 'MMM d, y HH:mm' }}</span>
                         </div>
                         <div class="panel-body">
                             {{ comment.text }}
