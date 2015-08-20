@@ -7,6 +7,8 @@
   $rootScope.$on('authenticated',(event,data) ->
     $rootScope.authenticated = true
     $rootScope.user = data
+    if($rootScope.user.admin)
+      $rootScope.edit = true;
 #    $rootScope.user.admin = true
 
     if(angular.isDefined($rootScope.initPath) && $rootScope.initPath != '/login')
