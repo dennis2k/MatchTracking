@@ -4,8 +4,8 @@
   vm.guys = guys.data
 
   vm.addComment = (comment, guy) ->
+    comment.owner = $rootScope.user._id;
     DerbyService.addCommentToGuy(comment,guy).then(() ->
-      comment.owner = $rootScope.user._id;
       guy.comments.push(angular.copy(comment))
       guy.comment = null
     )
