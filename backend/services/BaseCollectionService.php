@@ -64,6 +64,7 @@ class BaseCollectionService {
 
         if($this->generatedId)
             $id = new MongoId($id);
+        unset($doc['_id']);
 
         $this->collection->update(array('_id' => $id),$doc,array('upsert' => true));
         $newDoc = $this->collection->findOne(array('_id' => $id));

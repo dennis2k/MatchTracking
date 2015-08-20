@@ -61,6 +61,14 @@
                                 </li>
                             </ul>
                         </li>
+                        <li ng-class="{active : nav.isActive('/other')}">
+                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expand="true">Other<span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-class="{active : nav.isActive('/other/derby/list')}">
+                                    <a href="/#other/derby/list">Derby Extension</a>
+                                </li>
+                            </ul>
+                        </li>
                         <li><a ng-click="app.logout()">Logout</a></li>
                     </ul>
                 </div><!--/.nav-collapse -->

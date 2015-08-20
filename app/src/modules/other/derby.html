@@ -1,0 +1,27 @@
+<div class="row">
+
+    <form class="form-horizontal" name="vm.form" novalidate="">
+        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <h3>Derby GUY</h3>
+            <label class="control-label">Name</label>
+            <input ng-model="vm.derbyGuy.name" type="text" placeholder="" class="form-control input-md" ng-required="true">
+
+            <label class="control-label">Type</label>
+            <input ng-model="vm.derbyGuy.type" type="text" placeholder="" class="form-control input-md" ng-required="true">
+
+            <label class="control-label">Power</label>
+            <textarea rows="8" class="form-control input-md" ng-model="vm.derbyGuy.power"></textarea>
+
+            <label class="control-label">Image</label>
+            <div ngf-drop="" ngf-select="" ng-model="vm.files" ng-change="vm.upload(vm.files)" ngf-drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}" class="drop-box"  ngf-accept="'image/*'" ngf-drop-available="true">
+                <div class="drag-drop-files">Click to select</div>
+                    <span class="img-frame" ng-show="vm.derbyGuy.image_url">
+                        <img  ng-src="{{ vm.derbyGuy.image_url }}" width="100" height="100"/>
+                    </span>
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary pull-right" ng-click="vm.save(vm.derbyGuy)" ng-if="vm.canEdit()" style="margin-left: 5px;">Save</button>
+            <button type="submit" class="btn btn-danger pull-right" ng-click="vm.delete(vm.derbyGuy)" ng-if="vm.derbyGuy._id && vm.canEdit()">Delete</button>
+        </div>
+    </form>
+</div>

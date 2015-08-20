@@ -1,0 +1,58 @@
+<div class="row">
+
+
+    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+        <a class="btn btn-primary pull-right" href="#/other/derby/edit/null"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+    </div>
+</div>
+<div class="row v-offset-top-1">
+    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+        <ul class="event-list">
+            <li ng-repeat="guy in vm.guys| orderBy : 'create_time' : true" style="cursor: pointer;">
+                <img alt="" ng-src="{{ guy.image_url || 'asserts/img/sadpanda.jpg' }} " style="min-height: 180px !important; min-width: 180px" />
+
+                <div class="info" style="min-height: 180px !important;">
+
+                    <h1 class="title">{{ guy.name }}
+                        <a class="btn btn-danger btn-xs pull-right" ng-if="vm.canEdit(guy)" ng-click="vm.delete(guy)"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a class="btn btn-primary btn-xs pull-right" ng-if="vm.canEdit(guy)" ng-click="vm.selectGuy(guy)"><span class="glyphicon glyphicon-edit"></span></a>
+                    </h1>
+                    <h4 style="padding-left: 10px">{{ guy.type }}</h4>
+                    <p class="desc" style="font-size: 12px !important;"><strong>Power: </strong>{{ guy.power }}</p>
+                    <div class="pull-right">
+                        <a ng-if="!guy.show_comment " ng-click="guy.show_comment = true">Show comments</a>
+                        <a ng-if="guy.show_comment " ng-click="guy.show_comment = false">Hide comments</a>
+                    </div>
+
+                </div>
+                <div class="comment-box" style="display: block;" ng-repeat="comment in guy.comments | orderBy : 'create_time' : true" ng-if="guy.show_comment">
+                    <br />
+                    <br />
+                    <div class="panel panel-info" style="margin: 20px">
+                        <div class="panel-heading">
+                            <strong>{{ comment.owner }}</strong> <span class="text-muted">{{ comment.create_time | date : 'MMM d, y HH:mm' }}</span>
+                        </div>
+                        <div class="panel-body">
+                            {{ comment.text }}
+                        </div><!-- /panel-body -->
+                    </div><!-- /panel panel-default -->
+                </div>
+                <div class="comment-box post-comment" ng-if="guy.show_comment">
+                    <div >
+                        <form class="form-horizontal" name="vm.form" novalidate="" style="margin: 20px">
+                            <div class="form-group">
+                                <label class="control-label">Comment</label>
+                                <textarea class="form-control" rows="4" ng-model="guy.comment.text"></textarea>
+                            </div>
+
+
+                            <button class="btn btn-primary pull-right" ng-click="vm.addComment(guy.comment,guy)">Post</button>
+                            <br />
+                        </form>
+                    </div>
+                </div>
+
+            </li>
+        </ul>
+    </div>
+</div>

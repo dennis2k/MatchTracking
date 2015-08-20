@@ -11,6 +11,7 @@
   .factory('UserService',UserServiceWrapper)
   .factory('StatsService',StatsServiceWrapper)
   .factory('BaseService',BaseServiceWrapper)
+  .factory('DerbyService',DerbyServiceWrapper)
   .controller('ApplicationController',ApplicationController)
   .controller('AuthController',AuthController)
   .controller('GameGameController',GameGameController)
@@ -24,6 +25,8 @@
   .controller('CreateWishController',CreateWishController)
   .controller('ProfileController',ProfileController)
   .controller('StatsVersusController',StatsVersusController)
+  .controller('DerbyController',DerbyController)
+  .controller('DerbyListController',DerbyListController)
   .config(($routeProvider) ->
         $routeProvider.when('/gamegame',{templateUrl : 'src/modules/games/gamegame.html',controller : 'GameGameController', controllerAs : 'vm', resolve : GameGameController.resolve})
         $routeProvider.when('/games',{templateUrl : 'src/modules/games/games.html',controller : 'GamesController', controllerAs : 'vm', resolve : GamesController.resolve})
@@ -42,6 +45,8 @@
         $routeProvider.when('/login',{templateUrl : 'src/modules/auth/login.html',controller : 'AuthController', controllerAs : 'vm'})
         $routeProvider.when('/profile/:name',{templateUrl : 'src/modules/users/profile.html',controller : 'ProfileController', controllerAs : 'vm', resolve : ProfileController.resolve})
         $routeProvider.when('/stats/versus',{templateUrl : 'src/modules/stats/statsVersus.html',controller : 'StatsVersusController', controllerAs : 'vm', resolve : StatsVersusController.resolve})
+        $routeProvider.when('/other/derby/edit/:name',{templateUrl : 'src/modules/other/derby.html',controller : 'DerbyController', controllerAs : 'vm', resolve : DerbyController.resolve})
+        $routeProvider.when('/other/derby/list',{templateUrl : 'src/modules/other/derbyList.html',controller : 'DerbyListController', controllerAs : 'vm', resolve : DerbyListController.resolve})
         $routeProvider.otherwise({redirectTo: '/events'})
   )
   .config((localStorageServiceProvider) ->

@@ -124,7 +124,7 @@
         position: relative;
         display: block;
         width: 100%;
-        height: 120px;
+        min-height: 120px;
         padding: 0px;
     }
     .event-list > li > time,
@@ -136,7 +136,9 @@
         width: 120px;
         float: left;
     }
-    .event-list > li > .info {
+    .event-list > li > .info,
+    .event-list > li > .comment-box
+    {
         background-color: rgb(245, 245, 245);
         overflow: hidden;
     }
