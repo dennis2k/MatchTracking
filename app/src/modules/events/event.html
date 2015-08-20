@@ -13,7 +13,7 @@
         <p>{{ vm.currentEvent.end_date*1000 | date : 'd MMM yyyy' }}</p>
     </div>
     <div class="col-lg-1">
-        <button class="btn btn-danger" ng-click="vm.delete(vm.currentEvent)" ng-if="vm.canEdit"><span class="glyphicon glyphicon-remove"></span></button>
+        <button class="btn btn-danger" ng-click="vm.delete(vm.currentEvent)" ng-if="edit"><span class="glyphicon glyphicon-remove"></span></button>
     </div>
 </div>
 
