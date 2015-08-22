@@ -20,8 +20,8 @@
                     <h4 style="padding-left: 10px">{{ guy.type }}</h4>
                     <p class="desc" style="font-size: 12px !important;"><strong>Power: </strong>{{ guy.power }}</p>
                     <div class="pull-right">
-                        <a ng-if="!guy.show_comment " ng-click="guy.show_comment = true">Show comments</a>
-                        <a ng-if="guy.show_comment " ng-click="guy.show_comment = false">Hide comments</a>
+                        <a ng-if="!guy.show_comment " ng-click="guy.show_comment = true">Show comments ({{ guy.comments.length }})</a>
+                        <a ng-if="guy.show_comment " ng-click="guy.show_comment = false">Hide comments ({{ guy.comments.length }})</a>
                     </div>
 
                 </div>
@@ -30,7 +30,7 @@
                     <br />
                     <div class="panel panel-info" style="margin: 20px">
                         <div class="panel-heading">
-                            <strong>{{ comment.owner }}</strong> <span class="text-muted">{{ comment.create_time | date : 'MMM d, y HH:mm' }}</span>
+                            <strong>{{ comment.owner }}</strong> <span class="text-muted">{{ comment.create_time*1000 | date : 'MMM d, y HH:mm' }}</span>
                         </div>
                         <div class="panel-body">
                             {{ comment.text }}
