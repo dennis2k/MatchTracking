@@ -36,7 +36,7 @@ this.ApplicationController = function($rootScope, AuthService, $location, localS
   return vm;
 };
 
-this.BaseServiceWrapper = function($http, $q, $upload, toaster) {
+this.BaseServiceWrapper = function($http, $q, toaster) {
   return this.BaseService = (function() {
     var request;
 
@@ -666,6 +666,82 @@ this.EventServiceWrapper = function(BaseService, Utility) {
   return new EventService('events');
 };
 
+this.ProfileController = function($rootScope, UserService) {
+  var vm;
+  vm = this;
+  vm.user = $rootScope.user;
+  return console.log(vm.user, $rootScope.user);
+};
+
+ProfileController.resolve = {};
+
+this.UserController = function($filter, userList, UserService) {
+  var remove, save, vm;
+  vm = this;
+  vm.users = userList.data;
+  vm.newUser = {};
+  save = function(user) {
+    var existing;
+    existing = $filter('filter')(vm.users, function(u) {
+      return u._id === user._id;
+    });
+    if (existing.length === 0) {
+      return UserService.insert(user).then(function(result) {
+        if (result.status) {
+          return vm.users.push(result.data);
+        }
+      });
+    } else {
+      return UserService.update({
+        _id: user._id,
+        doc: user
+      });
+    }
+  };
+  remove = function(user) {
+    return UserService["delete"](user._id).then(function() {
+      var idx;
+      idx = vm.users.indexOf(user);
+      return vm.users.splice(idx, 1);
+    });
+  };
+  vm.save = save;
+  vm.remove = remove;
+  return vm;
+};
+
+UserController.resolve = {
+  userList: function(UserService) {
+    return UserService.query();
+  }
+};
+
+var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+this.UserServiceWrapper = function(BaseService) {
+  var UserService;
+  UserService = (function(superClass) {
+    extend(UserService, superClass);
+
+    function UserService() {
+      return UserService.__super__.constructor.apply(this, arguments);
+    }
+
+    UserService.prototype.findUserByName = function(name) {
+      return this.query({
+        doc: {
+          _id: name
+        }
+      });
+    };
+
+    return UserService;
+
+  })(BaseService);
+  return new UserService('users');
+};
+
 this.GameGameController = function($interval, $filter, gamesList) {
   var activation, findGames, play, reset, selectGame, timer, unselectGame, vm;
   vm = this;
@@ -824,82 +900,6 @@ this.GamesServiceWrapper = function(BaseService) {
 
   })(BaseService);
   return new GamesService('games');
-};
-
-this.ProfileController = function($rootScope, UserService) {
-  var vm;
-  vm = this;
-  vm.user = $rootScope.user;
-  return console.log(vm.user, $rootScope.user);
-};
-
-ProfileController.resolve = {};
-
-this.UserController = function($filter, userList, UserService) {
-  var remove, save, vm;
-  vm = this;
-  vm.users = userList.data;
-  vm.newUser = {};
-  save = function(user) {
-    var existing;
-    existing = $filter('filter')(vm.users, function(u) {
-      return u._id === user._id;
-    });
-    if (existing.length === 0) {
-      return UserService.insert(user).then(function(result) {
-        if (result.status) {
-          return vm.users.push(result.data);
-        }
-      });
-    } else {
-      return UserService.update({
-        _id: user._id,
-        doc: user
-      });
-    }
-  };
-  remove = function(user) {
-    return UserService["delete"](user._id).then(function() {
-      var idx;
-      idx = vm.users.indexOf(user);
-      return vm.users.splice(idx, 1);
-    });
-  };
-  vm.save = save;
-  vm.remove = remove;
-  return vm;
-};
-
-UserController.resolve = {
-  userList: function(UserService) {
-    return UserService.query();
-  }
-};
-
-var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-this.UserServiceWrapper = function(BaseService) {
-  var UserService;
-  UserService = (function(superClass) {
-    extend(UserService, superClass);
-
-    function UserService() {
-      return UserService.__super__.constructor.apply(this, arguments);
-    }
-
-    UserService.prototype.findUserByName = function(name) {
-      return this.query({
-        doc: {
-          _id: name
-        }
-      });
-    };
-
-    return UserService;
-
-  })(BaseService);
-  return new UserService('users');
 };
 
 this.CreateWishController = function($location, WishService) {

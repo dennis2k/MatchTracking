@@ -1,4 +1,4 @@
-@BaseServiceWrapper = ($http, $q, $upload,toaster) ->
+@BaseServiceWrapper = ($http, $q,toaster) ->
 
   #All services inherit common API calls
   class @BaseService
@@ -8,7 +8,7 @@
     #Private method for handling all http requests
     request = (method,url,params) ->
       params = {} if angular.isUndefined(params)
-      deferred = $q.defer();
+      deferred = $q.defer()
       $http {
               url : 'service.php/' + url
               method : method
